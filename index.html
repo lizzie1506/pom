@@ -201,7 +201,30 @@
                 alert("Login failed!");
             }
         });
+loginBtn.addEventListener('click', async () => {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
 
+    const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, password: pass })
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        // Save the "Digital ID" in the browser's memory
+        localStorage.setItem('pomoToken', data.token);
+        
+        // Hide Login, Show Timer
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('pomoContainer').style.display = 'block';
+        
+        alert("Welcome back, " + user + "!");
+    } else {
+        alert("Invalid username or password.");
+    }
+});
         // --- TIMER LOGIC ---
 
         startBtn.addEventListener('click', async () => {
