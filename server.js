@@ -142,5 +142,22 @@ app.delete('/delete-task/:id', async (req, res) => {
         res.status(400).send("Invalid Token");
     }
 });
+async function saveSession(taskName) {
+    const token = localStorage.getItem('pomoToken');
+    
+    const response = await fetch('http://localhost:3000/tasks', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // This proves who you are
+        },
+        body: JSON.stringify({ task_name: taskName, duration: 25 })
+    });
+
+    if (response.ok) {
+        console.log("Session saved to Neon!");
+        loadHistory(); // Refresh the list on the screen
+    }
+}
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
