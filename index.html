@@ -155,11 +155,11 @@
         // --- AUTH LOGIC ---
         
         // Register a new user
-        registerBtn.addEventListener('click', async () => {
+        const statusBox = document.getElementById('statusMessage');
+
+registerBtn.addEventListener('click', async () => {
     const user = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
-
-    if (!user || !pass) return alert("Please fill in both fields!");
 
     try {
         const response = await fetch('http://localhost:3000/register', {
@@ -171,17 +171,46 @@
         const result = await response.json();
 
         if (response.ok) {
-            alert("Success! User " + result.user.username + " is now in the database.");
-            // Optional: Automatically switch to login view
+            // 1. Set the text
+            statusBox.textContent = "Registration successful! You can now log in.";
+            // 2. Change the style to Green
+            statusBox.className = "status-success";
         } else {
-            alert("Signup Failed: " + result.error);
+            statusBox.textContent = "Signup Failed: " + (result.error || "Unknown error");
+            statusBox.className = "status-error";
         }
     } catch (error) {
-        console.error("Connection Error:", error);
-        alert("Check your terminal—is 'node server.js' running?");
+        statusBox.textContent = "Server error. Is your backend running?";
+        statusBox.className = "status-error";
     }
 });
+<div id="statusMessage" class="status-hide">
+    #statusMessage {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: none; /* Hidden by default */
+}
 
+/* Success Style */
+.status-success {
+    display: block !important;
+    background: rgba(60, 165, 92, 0.2);
+    color: #3ca55c;
+    border: 1px solid rgba(60, 165, 92, 0.3);
+}
+
+/* Error Style */
+.status-error {
+    display: block !important;
+    background: rgba(255, 95, 109, 0.2);
+    color: #ff5f6d;
+    border: 1px solid rgba(255, 95, 109, 0.3);
+}
+    </div>
         // Login and get the Token
         loginBtn.addEventListener('click', async () => {
             const user = document.getElementById('username').value;
