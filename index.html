@@ -110,6 +110,36 @@
         box-shadow: 0 10px 20px rgba(255, 154, 158, 0.3);
     }
 </style>
+<div id="statusMessage">
+   <style>
+    #statusMessage 
+    {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: none; /* This keeps it hidden until a login/signup happens */
+    }
+
+    .status-success 
+    {
+        display: block !important;
+        background: rgba(60, 165, 92, 0.2);
+        color: #3ca55c;
+        border: 1px solid rgba(60, 165, 92, 0.3);
+    }
+
+    .status-error 
+    {
+        display: block !important;
+        background: rgba(255, 95, 109, 0.2);
+        color: #ff5f6d;
+        border: 1px solid rgba(255, 95, 109, 0.3);
+    }
+</style>
+    </div>
 
 </head>
 <body>
@@ -185,33 +215,7 @@ registerBtn.addEventListener('click', async () => {
         statusBox.className = "status-error";
     }
 });
-<div id="statusMessage" class="status-hide">
-    #statusMessage {
-    margin-top : 15px;
-    padding: 10px;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: none; /* Hidden by default */
-}
 
-/* Success Style */
-.status-success {
-    display: block !important;
-    background: rgba(60, 165, 92, 0.2);
-    color: #3ca55c;
-    border: 1px solid rgba(60, 165, 92, 0.3);
-}
-
-/* Error Style */
-.status-error {
-    display: block !important;
-    background: rgba(255, 95, 109, 0.2);
-    color: #ff5f6d;
-    border: 1px solid rgba(255, 95, 109, 0.3);
-}
-    </div>
         // Login and get the Token
        loginBtn.addEventListener('click', async () => {
     const user = document.getElementById('username').value;
