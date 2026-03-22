@@ -20,8 +20,7 @@ app.post('/start-task', async (req, res) => {
     );
     res.json(result.rows[0]);
 });
-const express = require('express');
-const { Pool } = require('pg');
+
 const bcrypt = require('bcryptjs'); // For scrambling passwords
 const jwt = require('jsonwebtoken'); // For creating "Digital ID Cards"
 
