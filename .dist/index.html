@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomo - Focus Timer</title>
+    <style>
+    :root {
+        /* A softer, "Joyful" palette */
+        --joy-peach: #ff9a9e;
+        --joy-lemon: #fecfef;
+        --joy-mint: #a18cd1;
+        --joy-sky: #fbc2eb;
+        --glass: rgba(255, 255, 255, 0.25);
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    body {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-family: 'Quicksand', sans-serif; /* A rounder, friendlier font */
+        color: #4a4a4a;
+        overflow: hidden;
+        /* Animated Background Gradient */
+        background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #fbc2eb);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .container {
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        padding: 3rem;
+        border-radius: 40px; /* Extra round corners for a "soft" look */
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 380px;
+        text-align: center;
+        /* Make the whole box float gently */
+        animation: float 6s ease-in-out infinite;
+    }
+
+    h1 { font-weight: 700; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+
+    input {
+        width: 100%;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 20px;
+        border: none;
+        background: rgba(255, 255, 255, 0.5);
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        font-size: 1rem;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+    input:focus {
+        background: white;
+        transform: scale(1.02);
+    }
+
+    #timer {
+        font-size: 5.5rem;
+        font-weight: 800;
+        color: white;
+        margin: 10px 0;
+        /* Make the timer pulse gently */
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    button {
+        width: 100%;
+        padding: 18px;
+        border-radius: 20px;
+        border: none;
+        background: white;
+        color: #ff9a9e;
+        font-weight: 800;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy effect */
+    }
+
+    button:hover {
+        transform: scale(1.1) rotate(2deg);
+        background: #fff;
+        box-shadow: 0 10px 20px rgba(255, 154, 158, 0.3);
+    }
+</style>
+
+</head>
+<body>
+    <div id="authContainer" class="container">
+        <h1>Welcome to Pomo</h1>
+        <p>Login to track your focus</p>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button id="loginBtn">Login</button>
+            <button id="registerBtn" style="background: transparent; color: white; border: 1px solid white;">Sign Up</button>
+        </div>
+    </div>
+
+    <div id="pomoContainer" class="container" style="display: none;">
+        <h1>Pomo</h1>
+        <p id="userGreeting"></p>
+        <input type="text" id="taskInput" placeholder="What are you committing to?">
+        <div id="timer">25:00</div>
+        <button id="startBtn">Start Focus</button>
+        <div id="historySection" style="margin-top: 30px; text-align: left;">
+    <h3>Focus History</h3>
+    <ul id="taskList" style="list-style: none; padding: 0;"></ul>
+</div>
+        <br><br>
+        <a href="#" id="logoutBtn" style="color: white; font-size: 0.8rem;">Logout</a>
+    </div>
+
+    <script>
+        const authContainer = document.getElementById('authContainer');
+        const pomoContainer = document.getElementById('pomoContainer');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const startBtn = document.getElementById('startBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // CHECK IF ALREADY LOGGED IN
+        const savedToken = localStorage.getItem('pomoToken');
+        if (savedToken) {
+            showTimerScreen();
+        }
+
+        // --- AUTH LOGIC ---
+        
+        // Register a new user
+        registerBtn.addEventListener('click', async () => {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            
+            const res = await fetch('http://pomo-backend-z8qi.onrender.com/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+            const data = await res.json();
+            alert(data.message || data.error);
+        });
+
+        // Login and get the Token
+        loginBtn.addEventListener('click', async () => {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            
+            const res = await fetch('http://pomo-backend-z8qi.onrender.com/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                localStorage.setItem('pomoToken', data.token); // Save the "ID Card"
+                showTimerScreen();
+            } else {
+                alert("Login failed!");
+            }
+        });
+
+        // --- TIMER LOGIC ---
+
+        startBtn.addEventListener('click', async () => {
+            const task = document.getElementById('taskInput').value;
+            const token = localStorage.getItem('pomoToken');
+
+            if (!task) return alert("Enter a task!");
+
+            // Send task with the TOKEN in the Header
+            const res = await fetch('http://pomo-backend-z8qi.onrender.com/start-task', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': token // Handing over the ID Card
+                },
+                body: JSON.stringify({ taskName: task })
+            });
+
+            if (res.ok) {
+                document.body.classList.add('finished');
+                // ... (start the timer interval logic here as before)
+                console.log("Task saved to Neon!");
+            } else {
+                alert("Session expired. Please login again.");
+                logout();
+            }
+        });
+
+        function showTimerScreen() {
+            authContainer.style.display = 'none';
+            pomoContainer.style.display = 'block';
+            async function loadHistory() {
+    const token = localStorage.getItem('pomoToken');
+    const res = await fetch('http://pomo-backend-z8qi.onrender.com/my-tasks', {
+        headers: { 'Authorization': token }
+    });
+    
+    if (res.ok) {
+        const tasks = await res.json();
+        const list = document.getElementById('taskList');
+        list.innerHTML = ''; // Clear the old list
+        
+        tasks.forEach(task => {
+    const li = document.createElement('li');
+    li.style.display = "flex";
+    li.style.justifyContent = "space-between";
+    li.style.alignItems = "center";
+    li.style.borderBottom = "1px solid rgba(255,255,255,0.2)";
+    li.style.padding = "10px 0";
+
+    li.innerHTML = `
+        <span><strong>${task.task_name}</strong></span>
+        <button onclick="deleteTask(${task.id})" style="background: #c0392b; padding: 5px 10px; font-size: 0.7rem;">Delete</button>
+    `;
+    list.appendChild(li);
+});
+    }
+}
+        }
+
+        function logout() {
+            localStorage.removeItem('pomoToken');
+            location.reload();
+        }
+
+        logoutBtn.addEventListener('click', logout);
+        async function deleteTask(taskId) {
+    if (!confirm("Are you sure you want to delete this task?")) return;
+
+    const token = localStorage.getItem('pomoToken');
+    const res = await fetch(`http://pomo-backend-z8qi.onrender.com/delete-task/${taskId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': token }
+    });
+
+    if (res.ok) {
+        loadHistory(); // Refresh the list after deleting
+    } else {
+        alert("Failed to delete task.");
+    }
+}
+    </script>
+</body>
+</html>
