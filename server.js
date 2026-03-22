@@ -1,10 +1,9 @@
 const cors = require('cors');
+const express = require('express');
 const app = express();
 app.use(express.json());
 app.use(cors()); // This allows ANY website to talk to your server
-const express = require('express');
 const { Pool } = require('pg');
-
 
 
 
