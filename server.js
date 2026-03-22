@@ -55,7 +55,6 @@ app.use(express.json());
 app.post('/register', async (req, res) => {
     try {
         const { username, password } = req.body;
-        // Scramble the password 10 times for high security
         const hashedPassword = await bcrypt.hash(password, 10);
         
         const result = await pool.query(
@@ -64,7 +63,8 @@ app.post('/register', async (req, res) => {
         );
         res.json({ message: "User created!", user: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ error: "Username might already exist." });
+        console.error("DATABASE ERROR:", err.message); // This prints the REAL error in your terminal
+        res.status(500).json({ error: err.message }); // This sends the REAL error to the browser alert
     }
 });
 
