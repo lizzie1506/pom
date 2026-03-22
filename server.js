@@ -9,7 +9,7 @@ const { Pool } = require('pg');
 
 // Replace with your "Connection String" from the Neon Dashboard
 const pool = new Pool({
-  connectionString: 'postgresql://user:password@your-neon-url.neon.tech/neondb?sslmode=require',
+  connectionString:'postgresql://neondb_owner:npg_0np7QcNFkOyM@ep-divine-sound-aeycgwan-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
 });
 
 // The "CREATE" Route: Saves the task when the button is clicked
