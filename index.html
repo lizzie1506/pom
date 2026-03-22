@@ -355,6 +355,10 @@ loginBtn.addEventListener('click', async () => {
         alert("Failed to delete task.");
     }
 }
+function logout() {
+    localStorage.clear(); // Wipe the token
+    location.reload();    // Refresh the page to show Login again
+}
     </script>
 </body>
 </html>
