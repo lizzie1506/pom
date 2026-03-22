@@ -2,10 +2,8 @@ const cors = require('cors');
 app.use(cors()); // This allows ANY website to talk to your server
 const express = require('express');
 const { Pool } = require('pg');
-const cors = require('cors');
 
 const app = express();
-app.use(cors());
 app.use(express.json());
 
 // Replace with your "Connection String" from the Neon Dashboard
@@ -24,7 +22,6 @@ app.post('/start-task', async (req, res) => {
 });
 const express = require('express');
 const { Pool } = require('pg');
-const cors = require('cors');
 const bcrypt = require('bcryptjs'); // For scrambling passwords
 const jwt = require('jsonwebtoken'); // For creating "Digital ID Cards"
 
