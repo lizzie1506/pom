@@ -156,17 +156,31 @@
         
         // Register a new user
         registerBtn.addEventListener('click', async () => {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            
-            const res = await fetch('http://pomo-backend-z8qi.onrender.com/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: user, password: pass })
-            });
-            const data = await res.json();
-            alert(data.message || data.error);
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+
+    if (!user || !pass) return alert("Please fill in both fields!");
+
+    try {
+        const response = await fetch('http://localhost:3000/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, password: pass })
         });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("Success! User " + result.user.username + " is now in the database.");
+            // Optional: Automatically switch to login view
+        } else {
+            alert("Signup Failed: " + result.error);
+        }
+    } catch (error) {
+        console.error("Connection Error:", error);
+        alert("Check your terminal—is 'node server.js' running?");
+    }
+});
 
         // Login and get the Token
         loginBtn.addEventListener('click', async () => {
