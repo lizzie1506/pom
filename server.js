@@ -1,10 +1,12 @@
 const cors = require('cors');
+const app = express();
+app.use(express.json());
 app.use(cors()); // This allows ANY website to talk to your server
 const express = require('express');
 const { Pool } = require('pg');
 
-const app = express();
-app.use(express.json());
+
+
 
 // Replace with your "Connection String" from the Neon Dashboard
 const pool = new Pool({
