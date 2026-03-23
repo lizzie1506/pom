@@ -173,9 +173,7 @@
     <div id="historySection" style="margin-top: 30px; text-align: left; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
         <h3>Recent Focus Sessions</h3>
         <ul id="historyList"></ul>
-    </div>
-
-    <button onclick="logout()" style="background: rgba(255,255,255,0.2); margin-top: 30px; border: 1px solid white; cursor: pointer; padding: 10px 20px; border-radius: 8px; color: white;">
+    </div>     <button onclick="logout()" style="background: rgba(255,255,255,0.2); margin-top: 30px; border: 1px solid white; cursor: pointer; padding: 10px 20px; border-radius: 8px; color: white;">
         Log Out
     </button>
     <h3>Focus History</h3>
@@ -378,6 +376,33 @@ loginBtn.addEventListener('click', async () => {
 function logout() {
     localStorage.clear(); // Wipe the token
     location.reload();    // Refresh the page to show Login again
+}
+const startBtn = document.getElementById('startBtn');
+const timerDisplay = document.getElementById('timer');
+let timeLeft = 25 * 60; // 25 minutes in seconds
+let timerId = null;
+
+startBtn.addEventListener('click', () => {
+    // Prevent starting multiple timers at once
+    if (timerId !== null) return; 
+
+    timerId = setInterval(() => {
+        timeLeft--;
+        updateDisplay();
+
+        if (timeLeft <= 0) {
+            clearInterval(timerId);
+            timerId = null;
+            alert("Time's up! Great focus.");
+            // Later, we will call saveSession() here!
+        }
+    }, 1000);
+});
+
+function updateDisplay() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
     </script>
 </body>
