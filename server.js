@@ -8,8 +8,14 @@ const { Pool } = require('pg');
 
 
 // Replace with your "Connection String" from the Neon Dashboard
+
 const pool = new Pool({
-  connectionString:'postgresql://neondb_owner:npg_0np7QcNFkOyM@ep-divine-sound-aeycgwan-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
+  // This looks for the 'DATABASE_URL' we added to Render's Environment settings
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    // This is required for Neon to work securely with cloud hosts like Render
+    rejectUnauthorized: false
+  }
 });
 
 // The "CREATE" Route: Saves the task when the button is clicked
@@ -30,7 +36,7 @@ const SECRET_KEY = "your_super_secret_key_here"; // Keep this private!
 
 // This version allows BOTH your local testing and your live website
 app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], // Your local Live Server addresses
+    origin: '*', 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
