@@ -35,8 +35,10 @@ const jwt = require('jsonwebtoken'); // For creating "Digital ID Cards"
 const SECRET_KEY = "your_super_secret_key_here"; // Keep this private!
 
 // This version allows BOTH your local testing and your live website
+const cors = require('cors');
+
 app.use(cors({
-    origin: '*', 
+    origin: '*', // This allows 'null' origins and local files to connect
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
