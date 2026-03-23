@@ -30,23 +30,9 @@ const SECRET_KEY = "your_super_secret_key_here"; // Keep this private!
 
 // This version allows BOTH your local testing and your live website
 app.use(cors({
-    origin: function (origin, callback) {
-        const allowedOrigins = [
-            'http://localhost:5500', // If using Live Server
-            'http://127.0.0.1:5500', 
-            'https://your-pomo-app.vercel.app', // Your live site
-            null // This allows "file://" origins (opening index.html directly)
-        ];
-        
-        // Allow requests with no origin (like mobile apps or curl) 
-        // or if the origin is in our allowed list
-        if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin === 'null') {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
+    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], // Your local Live Server addresses
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
