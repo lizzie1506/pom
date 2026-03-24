@@ -322,29 +322,30 @@
         }
 
         async function loadHistory() {
-            const token = localStorage.getItem('pomoToken');
-            if (!token) return;
-            
-            try {
-                const response = await fetch('/history', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+    const token = localStorage.getItem('pomoToken');
+    
+    // 1. Tell the browser WHERE to go (Your Render URL + /history)
+    const backendURL = "https://pomo-backend-slsl.onrender.com/history"; 
 
-                if (response.ok) {
-                    const historyData = await response.json();
-                    const list = document.getElementById('historyList');
-                    list.innerHTML = ''; 
-
-                    historyData.forEach(session => {
-                        const li = document.createElement('li');
-                        li.textContent = `${session.task_name}: ${new Date(session.created_at).toLocaleDateString()}`;
-                        list.appendChild(li);
-                    });
-                }
-            } catch (err) {
-                console.error("Load history error:", err);
+    try {
+        const response = await fetch(backendURL, {
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            displayHistory(data); // Call a function to show it on screen
+        } else {
+            console.error("History fetch failed with status:", response.status);
         }
+    } catch (err) {
+        console.error("Network Error:", err);
+    }
+}
     </script>
 </body>
 </html>
