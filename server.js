@@ -1,34 +1,30 @@
+require('dotenv').config();
 const express = require('express');
-const cors = require('cors'); // 1. Import CORS
+const cors = require('cors');
+const path = require('path');
 const app = express();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// 2. ENABLE CORS BEFORE ANY ROUTES
-app.use(cors({
-    origin: '*', // This allows ALL origins (good for testing)
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Enable CORS and JSON parsing
+app.use(cors());
+app.use(express.json());
 
-app.use(express.json()); // 3. Parse JSON after CORS
-
-// 1. FIXED CORS: This allows your local computer AND your live site to connect
-app.use(cors()); 
+// Serve static files (index.html, etc.)
+app.use(express.static(path.join(__dirname)));
 
 const SECRET_KEY = process.env.JWT_SECRET || "your_super_secret_key_here";
 
-// 2. Database Connection
+// Database Connection
 const { Pool } = require('pg');
 const pool = new Pool({
-  // REPLACED: Directly using your Neon connection string here
-  connectionString: "postgres://neondb_owner:npg_MT6L0YvbeUax@ep-floral-dawn-a5asv22n-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require",
+  connectionString: process.env.DATABASE_URL || "postgres://neondb_owner:npg_MT6L0YvbeUax@ep-floral-dawn-a5asv22n-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require",
   ssl: {
-    rejectUnauthorized: false // Required for Neon + Render
+    rejectUnauthorized: false
   }
 });
 
-// 3. Health Check (To wake up the server)
+// 3. Health Check
 app.get('/health', (req, res) => {
     res.send("Server is healthy and awake!");
 });
@@ -70,6 +66,7 @@ app.post('/login', async (req, res) => {
             res.status(400).json({ error: "Invalid password" });
         }
     } catch (err) {
+        console.error("LOGIN ERROR:", err.message);
         res.status(500).json({ error: "Server error" });
     }
 });
@@ -80,7 +77,7 @@ app.get('/my-tasks', async (req, res) => {
     if (!token) return res.status(401).send("No Token Provided");
 
     try {
-        const verified = jwt.verify(token.split(" ")[1], SECRET_KEY); // Fixed: Added split for Bearer token
+        const verified = jwt.verify(token.split(" ")[1], SECRET_KEY);
         const result = await pool.query(
             'SELECT * FROM tasks WHERE user_id = $1 ORDER BY created_at DESC',
             [verified.userId]
@@ -97,7 +94,7 @@ app.post('/start-task', async (req, res) => {
     if (!token) return res.status(401).send("Access Denied");
 
     try {
-        const verified = jwt.verify(token.split(" ")[1], SECRET_KEY); // Fixed: Added split for Bearer token
+        const verified = jwt.verify(token.split(" ")[1], SECRET_KEY);
         const { taskName } = req.body;
         
         const result = await pool.query(
@@ -116,7 +113,7 @@ app.delete('/delete-task/:id', async (req, res) => {
     if (!token) return res.status(401).send("No Token Provided");
 
     try {
-        const verified = jwt.verify(token.split(" ")[1], SECRET_KEY); // Fixed: Added split for Bearer token
+        const verified = jwt.verify(token.split(" ")[1], SECRET_KEY);
         const { id } = req.params;
         await pool.query(
             'DELETE FROM tasks WHERE id = $1 AND user_id = $2',
@@ -128,6 +125,32 @@ app.delete('/delete-task/:id', async (req, res) => {
     }
 });
 
-// Start Server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+// 9. HISTORY ROUTE (since frontend calls it)
+app.get('/history', async (req, res) => {
+    const token = req.headers['authorization'];
+    if (!token) return res.status(401).send("No Token Provided");
+
+    try {
+        const verified = jwt.verify(token.split(" ")[1], SECRET_KEY);
+        const result = await pool.query(
+            'SELECT * FROM tasks WHERE user_id = $1 ORDER BY created_at DESC',
+            [verified.userId]
+        );
+        res.json(result.rows);
+    } catch (err) {
+        res.status(400).send("Invalid Token");
+    }
+});
+
+// Catch-all route to serve index.html for any other request (SPA support)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Export for Vercel
+module.exports = app;
+
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+}

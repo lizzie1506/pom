@@ -20,6 +20,7 @@
             align-items: center;
             height: 100vh;
             overflow: hidden;
+            flex-direction: column;
         }
 
         /* 2. The Sleek Black Card */
@@ -33,14 +34,17 @@
             text-align: center;
             border: 1px solid #333;
             animation: slideUpFade 0.8s ease-out;
+            margin-bottom: 20px;
         }
 
-        h2 {
+        h2, h3 {
             color: #ffffff;
             margin-bottom: 25px;
             font-weight: 700;
-            font-size: 2rem;
         }
+
+        h2 { font-size: 2rem; }
+        h3 { font-size: 1.2rem; margin-bottom: 15px; }
 
         /* 3. Input Groups */
         .input-group {
@@ -123,24 +127,33 @@
             0% { opacity: 0; transform: translateY(40px); }
             100% { opacity: 1; transform: translateY(0); }
         }
-        #taskList {
-    margin-top: 20px;
-    padding: 0;
-    list-style: none;
-    max-height: 150px;
-    overflow-y: auto; /* Adds a scrollbar if the list gets long */
-}
 
-#taskList li {
-    background: rgba(255, 255, 255, 0.05);
-    margin-bottom: 8px;
-    padding: 10px;
-    border-radius: 8px;
-    color: #eee;
-    font-size: 0.9rem;
-    border-left: 4px solid #D2122E; /* Red accent line */
-    text-align: left;
-}
+        #historyContainer {
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 400px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #333;
+        }
+
+        #historyList {
+            list-style: none;
+            padding: 0;
+        }
+
+        #historyList li {
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 8px;
+            color: #eee;
+            font-size: 0.9rem;
+            border-left: 4px solid #D2122E;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -170,23 +183,16 @@
         </div>
     </div>
 
-    <script>
-        window.onload = async () => {
-    const token = localStorage.getItem('pomoToken');
-    
-    if (token) {
-        // 1. Hide the login form and show the app
-        document.getElementById('authContainer').style.display = 'none';
-        document.getElementById('timerContainer').style.display = 'block';
-        document.getElementById('historyContainer').style.display = 'block';
+    <div id="historyContainer" class="glass-card" style="display: none;">
+        <h3>Focus History</h3>
+        <ul id="historyList"></ul>
+    </div>
 
-        // 2. Automatically fetch the history from the database
-        await loadHistory(); 
-    }
-};
+    <script>
         // DOM Elements
         const authContainer = document.getElementById('authContainer');
         const pomoContainer = document.getElementById('pomoContainer');
+        const historyContainer = document.getElementById('historyContainer');
         const statusBox = document.getElementById('statusBox');
         const loginBtn = document.getElementById('loginBtn');
         const signupBtn = document.getElementById('signupBtn');
@@ -195,16 +201,20 @@
         let timeLeft = 25 * 60;
         let timerId = null;
 
-        // 1. Auto-Login Check
-        if (localStorage.getItem('pomoToken')) {
-            showTimer();
-        }
+        window.onload = async () => {
+            const token = localStorage.getItem('pomoToken');
+            if (token) {
+                showApp();
+            }
+        };
 
-        function showTimer() {
+        function showApp() {
             authContainer.style.display = 'none';
             pomoContainer.style.display = 'block';
+            historyContainer.style.display = 'block';
             const user = localStorage.getItem('username') || 'User';
             document.getElementById('welcomeText').innerText = `Hello, ${user}`;
+            loadHistory();
         }
 
         function updateStatus(msg, color) {
@@ -212,18 +222,15 @@
             statusBox.style.color = color;
         }
 
-        // 2. Login Logic
         loginBtn.addEventListener('click', async () => {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
-            document.getElementById('historyContainer').style.display = 'block';
 
             if(!user || !pass) return updateStatus("Please fill all fields", "orange");
-
             updateStatus("Logging in...", "white");
 
             try {
-                const res = await fetch('https://pomo-backend-slsl.onrender.com/login', {
+                const res = await fetch('/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: user, password: pass })
@@ -233,22 +240,21 @@
                 if (res.ok) {
                     localStorage.setItem('pomoToken', data.token);
                     localStorage.setItem('username', user);
-                    showTimer();
+                    showApp();
                 } else {
                     updateStatus(data.error || "Login failed", "#ff4d4d");
                 }
             } catch (err) {
-                updateStatus("Server is waking up... try again.", "yellow");
+                updateStatus("Server error. Try again.", "yellow");
             }
         });
 
-        // 3. Sign Up Logic
         signupBtn.addEventListener('click', async () => {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
 
             try {
-                const res = await fetch('https://pomo-backend-slsl.onrender.com/register', {
+                const res = await fetch('/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: user, password: pass })
@@ -265,7 +271,6 @@
             }
         });
 
-        // 4. Timer Logic
         document.getElementById('startBtn').addEventListener('click', () => {
             if (timerId) return;
             timerId = setInterval(() => {
@@ -276,7 +281,10 @@
                 if (timeLeft <= 0) {
                     clearInterval(timerId);
                     timerId = null;
+                    saveFocusSession();
                     alert("Focus session complete!");
+                    timeLeft = 25 * 60;
+                    timerText.innerText = "25:00";
                 }
             }, 1000);
         });
@@ -287,59 +295,56 @@
             timeLeft = 25 * 60;
             timerText.innerText = "25:00";
         });
-        <div id="historyContainer" style="display: none;">
-    <h3>Focus History</h3>
-    <ul id="historyList">
-        </ul>
-</div>
+
         function logout() {
             localStorage.clear();
             location.reload();
         }
-async function saveFocusSession() {
-    const token = localStorage.getItem('pomoToken');
-    const taskName = "Focus Session"; // You can change this to an input value later
 
-    try {
-        const response = await fetch('https://pomo-backend-slsl.onrender.com/start-task', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': token // Sends your "Digital ID"
-            },
-            body: JSON.stringify({ taskName: taskName })
-        });
+        async function saveFocusSession() {
+            const token = localStorage.getItem('pomoToken');
+            try {
+                const response = await fetch('/start-task', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ taskName: "Focus Session" })
+                });
 
-        if (response.ok) {
-            console.log("Session saved to database!");
-            loadHistory(); // Refresh the list of checkmarks on the screen
+                if (response.ok) {
+                    loadHistory();
+                }
+            } catch (err) {
+                console.error("Failed to save session:", err);
+            }
         }
-    } catch (err) {
-        console.error("Failed to save session:", err);
-    }
-}
-async function loadHistory() {
-    const token = localStorage.getItem('pomoToken');
-    const response = await fetch('https://pomo-backend-slsl.onrender.com/history', {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
 
-    if (response.ok) {
-        const historyData = await response.json();
-        const list = document.getElementById('historyList');
-        
-        // Clear the old list first
-        list.innerHTML = ''; 
+        async function loadHistory() {
+            const token = localStorage.getItem('pomoToken');
+            if (!token) return;
+            
+            try {
+                const response = await fetch('/history', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
 
-        // Add each session to the list
-        historyData.forEach(session => {
-            const li = document.createElement('li');
-            li.textContent = `${session.task_name}: ${session.duration} mins - ${new Date(session.created_at).toLocaleDateString()}`;
-            list.appendChild(li);
-        });
-    }
-}
+                if (response.ok) {
+                    const historyData = await response.json();
+                    const list = document.getElementById('historyList');
+                    list.innerHTML = ''; 
 
+                    historyData.forEach(session => {
+                        const li = document.createElement('li');
+                        li.textContent = `${session.task_name}: ${new Date(session.created_at).toLocaleDateString()}`;
+                        list.appendChild(li);
+                    });
+                }
+            } catch (err) {
+                console.error("Load history error:", err);
+            }
+        }
     </script>
 </body>
 </html>
