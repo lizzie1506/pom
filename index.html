@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PomoFocus Login</title>
     <style>
-        /* 1. Global Reset */
+        /* 1. Global Reset & Body Styling */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Poppins', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* A more modern font */
 }
 
 body {
-    /* Solid Cherry Red Background */
-    background-color: #D2122E; 
+    background-color: #D2122E; /* Solid Cherry Red */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,72 +22,154 @@ body {
     overflow: hidden;
 }
 
-/* 2. Centered White Login Card */
+/* 2. Enhanced Login Card */
 .login-card {
     background-color: #ffffff;
-    padding: 2.5rem;
-    border-radius: 15px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    padding: 3rem;
+    border-radius: 20px; /* Softer, rounded corners */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* Deeper shadow for elevation */
     width: 100%;
-    max-width: 380px;
+    max-width: 420px;
     text-align: center;
+    /* Subtle animation on page load */
+    animation: fadeInScale 0.6s ease-out;
 }
 
 h2 {
     color: #333;
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+    font-weight: 700;
 }
 
-/* 3. Input Styling */
+/* 3. Aesthetic Input Styling with Interaction */
 .input-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
     text-align: left;
 }
 
 input {
     width: 100%;
-    padding: 12px 15px;
+    padding: 15px 20px;
     margin-top: 5px;
-    border: 2px solid #eee;
-    border-radius: 8px;
+    border: 2px solid #f0f0f0;
+    border-radius: 10px;
     font-size: 1rem;
-    transition: border-color 0.3s ease;
+    color: #333;
+    transition: all 0.3s ease; /* Smooth transition for everything */
+    background-color: #fafafa;
 }
 
 input:focus {
     outline: none;
-    border-color: #D2122E; /* Border turns red when typing */
+    border-color: #D2122E; /* Red border on focus */
+    background-color: #ffffff;
+    /* A subtle red glow (box-shadow) when active */
+    box-shadow: 0 0 10px rgba(210, 18, 46, 0.15);
+    transform: translateY(-2px); /* Lifts the input slightly */
 }
 
-/* 4. Login Button */
+/* 4. Sleek Button with Hover Effects */
 #loginBtn {
     width: 100%;
-    padding: 12px;
-    background-color: #333; /* Dark button looks sleek on white/red */
+    padding: 15px;
+    background-color: #333; /* Dark default button */
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
+    border-radius: 10px;
+    font-size: 1.2rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s;
-    margin-top: 1rem;
+    transition: all 0.3s ease;
+    margin-top: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 #loginBtn:hover {
-    background-color: #000;
+    background-color: #000; /* Darkens further on hover */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px); /* Lifts the button on hover */
 }
 
 #loginBtn:active {
-    transform: scale(0.97);
+    transform: scale(0.97); /* Depresses slightly on click */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+/* Styling for the Primary Login Button (Keep your existing #loginBtn and add this) */
+#loginBtn {
+    width: 100%;
+    padding: 15px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1.5rem;
 }
 
-/* 5. Status Text */
+/* New Styling for the Secondary Sign Up Button */
+.secondary-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: transparent; /* Transparent background */
+    color: #D2122E; /* Cherry Red text */
+    border: 2px solid #D2122E; /* Cherry Red border */
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px; /* Small gap between buttons */
+}
+
+.secondary-btn:hover {
+    background-color: rgba(210, 18, 46, 0.05); /* Very light red tint on hover */
+    transform: translateY(-2px);
+}
+
+.secondary-btn:active {
+    transform: scale(0.98);
+}
+
+/* 5. Status Text and Signup Link */
 #statusBox {
-    margin-top: 1rem;
-    font-size: 0.9rem;
+    margin-top: 1.2rem;
+    font-size: 0.95rem;
     font-weight: 500;
+    min-height: 1.2em; /* Prevents layout shift */
+}
+
+.toggle-text {
+    margin-top: 1.5rem;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.toggle-text a {
+    color: #D2122E;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.toggle-text a:hover {
+    color: #a00d23; /* Darker red on hover */
+    text-decoration: underline;
+}
+
+/* 6. Animations */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
     </style>
 </head>
