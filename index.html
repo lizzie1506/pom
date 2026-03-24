@@ -171,6 +171,19 @@
     </div>
 
     <script>
+        window.onload = async () => {
+    const token = localStorage.getItem('pomoToken');
+    
+    if (token) {
+        // 1. Hide the login form and show the app
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('timerContainer').style.display = 'block';
+        document.getElementById('historyContainer').style.display = 'block';
+
+        // 2. Automatically fetch the history from the database
+        await loadHistory(); 
+    }
+};
         // DOM Elements
         const authContainer = document.getElementById('authContainer');
         const pomoContainer = document.getElementById('pomoContainer');
@@ -203,13 +216,14 @@
         loginBtn.addEventListener('click', async () => {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
+            document.getElementById('historyContainer').style.display = 'block';
 
             if(!user || !pass) return updateStatus("Please fill all fields", "orange");
 
             updateStatus("Logging in...", "white");
 
             try {
-                const res = await fetch('https://pomo-backend-z8qi.onrender.com/login', {
+                const res = await fetch('https://pomo-backend-slsl.onrender.com/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: user, password: pass })
@@ -234,7 +248,7 @@
             const pass = document.getElementById('password').value;
 
             try {
-                const res = await fetch('https://pomo-backend-z8qi.onrender.com/register', {
+                const res = await fetch('https://pomo-backend-slsl.onrender.com/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: user, password: pass })
@@ -273,6 +287,11 @@
             timeLeft = 25 * 60;
             timerText.innerText = "25:00";
         });
+        <div id="historyContainer" style="display: none;">
+    <h3>Focus History</h3>
+    <ul id="historyList">
+        </ul>
+</div>
         function logout() {
             localStorage.clear();
             location.reload();
@@ -282,7 +301,7 @@ async function saveFocusSession() {
     const taskName = "Focus Session"; // You can change this to an input value later
 
     try {
-        const response = await fetch('https://pomo-backend-z8qi.onrender.com/start-task', {
+        const response = await fetch('https://pomo-backend-slsl.onrender.com/start-task', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -299,6 +318,28 @@ async function saveFocusSession() {
         console.error("Failed to save session:", err);
     }
 }
+async function loadHistory() {
+    const token = localStorage.getItem('pomoToken');
+    const response = await fetch('https://pomo-backend-slsl.onrender.com/history', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.ok) {
+        const historyData = await response.json();
+        const list = document.getElementById('historyList');
+        
+        // Clear the old list first
+        list.innerHTML = ''; 
+
+        // Add each session to the list
+        historyData.forEach(session => {
+            const li = document.createElement('li');
+            li.textContent = `${session.task_name}: ${session.duration} mins - ${new Date(session.created_at).toLocaleDateString()}`;
+            list.appendChild(li);
+        });
+    }
+}
+
     </script>
 </body>
 </html>
