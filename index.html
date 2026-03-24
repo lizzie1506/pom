@@ -237,7 +237,7 @@ document.getElementById('celebrationModal').style.display = 'flex';
         function resetTimer() {
             clearInterval(timerId);
             timerId = null;
-            timeLeft = 25 * 60;
+            timeLeft = 1 * 60; // Reset to 1 minute for testing for now 
             updateDisplay();
             document.getElementById('startBtn').innerText = "Start Focus";
         }
