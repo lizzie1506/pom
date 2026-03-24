@@ -5,155 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PomoFocus | Dark Cherry</title>
     <style>
-        /* 1. Global Reset & Body Styling */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-        }
-
+        /* 1. RESET & LAYOUT */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
         body {
-            background-color: #5e0b15; /* Dark Cherry Red Background */
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            /* Using the Workspace Background Image */
+            background: url('https://t3.ftcdn.net/jpg/03/16/91/28/360_F_316912806_S76reL7shSpxvjI9vGv12S28vK9vO8S6.jpg') no-repeat center center/cover;
+        }
+
+        /* 2. THE GLASS CARD */
+        .auth-container {
+            display: flex;
+            width: 900px;
+            height: 550px;
+            border-radius: 20px;
             overflow: hidden;
-            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: transparent;
         }
 
-        /* 2. The Sleek Black Card */
-        .glass-card {
-            background-color: #1a1a1a; /* Charcoal Black */
-            padding: 45px;
-            border-radius: 24px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            border: 1px solid #333;
-            animation: slideUpFade 0.8s ease-out;
-            margin-bottom: 20px;
-        }
+        /* Left Side: Stays clear to show the coffee/keyboard */
+        .auth-left { flex: 1.2; }
 
-        h2, h3 {
-            color: #ffffff;
-            margin-bottom: 25px;
-            font-weight: 700;
-        }
-
-        h2 { font-size: 2rem; }
-        h3 { font-size: 1.2rem; margin-bottom: 15px; }
-
-        /* 3. Input Groups */
-        .input-group {
-            margin-bottom: 18px;
-        }
-
-        input {
-            width: 100%;
-            padding: 15px;
-            border: 1px solid #444;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background-color: #2a2a2a;
-            color: #ffffff;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #D2122E;
-            box-shadow: 0 0 10px rgba(210, 18, 46, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* 4. Buttons */
-        .button-group {
+        /* Right Side: The Frosted Glass Form */
+        .auth-right {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.25); /* Light transparency */
+            backdrop-filter: blur(12px); /* THE GLASS EFFECT */
+            -webkit-backdrop-filter: blur(12px);
+            padding: 60px 40px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 20px;
+            justify-content: center;
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            color: #4a3f35; /* Dark Coffee Brown for text */
         }
 
-        button {
+        h2 { font-size: 2.2rem; margin-bottom: 5px; color: #3d2b1f; }
+        .subtitle { font-size: 0.9rem; margin-bottom: 35px; color: #6d5f52; }
+
+        /* 3. INPUT STYLES */
+        .input-group { margin-bottom: 25px; }
+        label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #5d4a3a; }
+        
+        input {
             width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        #loginBtn {
-            background-color: #D2122E; /* Cherry Red */
-            color: white;
+            background: transparent;
             border: none;
+            border-bottom: 1.5px solid rgba(74, 63, 53, 0.3);
+            padding: 12px 0;
+            color: #3d2b1f;
+            outline: none;
+            transition: 0.3s;
         }
 
-        #loginBtn:hover {
-            background-color: #f01e3c;
-            transform: translateY(-2px);
-        }
+        input:focus { border-bottom-color: #8b5e3c; }
 
-        #signupBtn {
-            background-color: transparent;
-            color: #ffffff;
-            border: 1px solid #444;
-        }
+        /* 4. BUTTONS & LINKS */
+        .options { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 30px; }
+        .options a { text-decoration: none; color: #8b5e3c; font-weight: bold; }
 
-        #signupBtn:hover {
-            background-color: #333;
-            transform: translateY(-2px);
-        }
-
-        /* 5. Timer Styling */
-        #timerDisplay {
-            font-size: 4rem;
-            color: #ffffff;
-            font-weight: 700;
-            margin: 20px 0;
-        }
-
-        #statusBox {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            min-height: 1.5em;
-        }
-
-        @keyframes slideUpFade {
-            0% { opacity: 0; transform: translateY(40px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        #historyContainer {
-            max-height: 200px;
-            overflow-y: auto;
-            width: 100%;
-            max-width: 400px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #333;
-        }
-
-        #historyList {
-            list-style: none;
-            padding: 0;
-        }
-
-        #historyList li {
-            background: rgba(255, 255, 255, 0.05);
-            margin-bottom: 8px;
-            padding: 10px;
+        .main-btn {
+            background: #3d2b1f; /* Dark Coffee Color */
+            color: #fdfaf7;
+            padding: 15px;
+            border: none;
             border-radius: 8px;
-            color: #eee;
-            font-size: 0.9rem;
-            border-left: 4px solid #D2122E;
-            text-align: left;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
         }
+
+        .main-btn:hover { background: #5d4a3a; transform: translateY(-2px); }
+
+        .toggle-link { text-align: center; margin-top: 20px; font-size: 0.85rem; }
+        .toggle-link a { color: #8b5e3c; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
