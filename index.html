@@ -328,7 +328,7 @@
     const backendURL = "https://pomo-backend-slsl.onrender.com/history"; 
 
     try {
-        const response = await fetch(backendURL, {
+        const response = await fetch("https://pomo-backend-slsl.onrender.com/history", {
             method: 'GET',
             headers: { 
                 'Authorization': `Bearer ${token}`,
