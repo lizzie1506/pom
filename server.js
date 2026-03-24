@@ -44,6 +44,41 @@ app.use(cors({
 }));
 app.use(express.json());
 
+const signupBtn = document.getElementById('signupBtn');
+
+signupBtn.addEventListener('click', async () => {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    const statusBox = document.getElementById('statusBox');
+
+    // Simple check so we don't send empty data to Render
+    if (!user || !pass) {
+        statusBox.innerText = "Please fill in both fields.";
+        statusBox.style.color = "orange";
+        return;
+    }
+
+    try {
+        const response = await fetch('https://pomo-backend-z8qi.onrender.com/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, password: pass })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            statusBox.style.color = "green";
+            statusBox.innerText = "Account created! You can now login.";
+        } else {
+            statusBox.style.color = "white"; // Error text should be visible on red or dark background
+            statusBox.innerText = data.error || "Registration failed.";
+        }
+    } catch (error) {
+        statusBox.innerText = "Connection error. Is the server awake?";
+    }
+});
+
 
 // 2. REGISTER ROUTE: Create a new user
 app.post('/register', async (req, res) => {
