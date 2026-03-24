@@ -93,37 +93,6 @@ input:focus {
     </style>
 </head>
 <body>
-
-    <div id="authContainer" class="container">
-        <h1>Welcome to Pomo</h1>
-        <p style="color: white;">Login to track your focus</p>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button id="loginBtn">Login</button>
-        <button id="registerBtn" style="background: transparent; color: white; border: 1px solid white;">Sign Up</button>
-        <div id="statusMessage"></div>
-    </div>
-
-    <div id="pomoContainer" class="container" style="display: none;">
-        <h1>PomoFocus</h1>
-        <h2 id="welcomeText" style="color: white;"></h2>
-        
-        <input type="text" id="taskInput" placeholder="What are you working on?">
-        <div class="timer-display" id="timer">25:00</div>
-        
-        <div style="display: flex; gap: 10px;">
-            <button id="startBtn">Start</button>
-            <button id="resetBtn" style="background: rgba(255,255,255,0.3); color: white;">Reset</button>
-        </div>
-
-        <div class="history-section">
-            <h3 style="font-size: 1rem;">Recent Sessions</h3>
-            <ul id="taskList" style="list-style: none; padding: 0; font-size: 0.8rem;"></ul>
-        </div>
-
-        <button onclick="logout()" style="background: rgba(255,0,0,0.2); color: white; margin-top: 20px;">Log Out</button>
-    </div>
-    <body>
     <div class="login-card">
         <h2>Welcome Back</h2>
         <div class="input-group">
