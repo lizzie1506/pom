@@ -16,6 +16,7 @@ app.use(cors());
 const SECRET_KEY = process.env.JWT_SECRET || "your_super_secret_key_here";
 
 // 2. Database Connection
+const { Pool } = require('pg');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
