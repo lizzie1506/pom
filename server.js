@@ -1,114 +1,35 @@
 const cors = require('cors');
 const express = require('express');
-const app = express();
-app.use(express.json());
-app.use(cors()); // This allows ANY website to talk to your server
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 
+const app = express();
+app.use(express.json());
+// 1. FIXED CORS: This allows your local computer AND your live site to connect
+app.use(cors()); 
 
+const SECRET_KEY = process.env.JWT_SECRET || "your_super_secret_key_here";
 
-// Replace with your "Connection String" from the Neon Dashboard
-
+// 2. Database Connection
 const pool = new Pool({
-  // This looks for the 'DATABASE_URL' we added to Render's Environment settings
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    // This is required for Neon to work securely with cloud hosts like Render
-    rejectUnauthorized: false
+    rejectUnauthorized: false // Required for Neon + Render
   }
 });
 
-// The "CREATE" Route: Saves the task when the button is clicked
-app.post('/start-task', async (req, res) => {
-    const { taskName } = req.body;
-    const result = await pool.query(
-        'INSERT INTO tasks (task_name) VALUES ($1) RETURNING *', 
-        [taskName]
-    );
-    res.json(result.rows[0]);
+// 3. Health Check (To wake up the server)
+app.get('/health', (req, res) => {
+    res.send("Server is healthy and awake!");
 });
 
-const bcrypt = require('bcryptjs'); // For scrambling passwords
-const jwt = require('jsonwebtoken'); // For creating "Digital ID Cards"
-
-
-const SECRET_KEY = "your_super_secret_key_here"; // Keep this private!
-
-// This version allows BOTH your local testing and your live website
-
-
-app.use(cors({
-    origin: 'http://127.0.0.1:5500', // This allows 'null' origins and local files to connect
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
-// 1. Grab the elements from the HTML
-const loginBtn = document.getElementById('loginBtn');
-const signupBtn = document.getElementById('signupBtn');
-const statusBox = document.getElementById('statusBox');
-// 2. The Login Function
-loginBtn.addEventListener('click', async () => {
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
-    if (!user || !pass) {
-        updateStatus("Please enter both fields", "orange");
-        return;
-    }
-
-    try {
-        const response = await fetch('https://pomo-backend-z8qi.onrender.com/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: user, password: pass })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            // Save the "VIP Pass" (Token) and go to the timer page
-            localStorage.setItem('pomoToken', data.token);
-            updateStatus("Login successful! Redirecting...", "green");
-            setTimeout(() => { window.location.href = 'timer.html'; }, 1500);
-        } else {
-            updateStatus(data.error || "Invalid credentials", "red");
-        }
-    } catch (error) {
-        updateStatus("Server is sleeping. Try again in 30 seconds.", "red");
-    }
-});
-
-// 3. The Sign Up Function
-signupBtn.addEventListener('click', async () => {
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
-
-    try {
-        const response = await fetch('https://pomo-backend-z8qi.onrender.com/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: user, password: pass })
-        });
-
-        if (response.ok) {
-            updateStatus("Account created! You can now login.", "green");
-        } else {
-            const data = await response.json();
-            updateStatus(data.error || "Registration failed", "red");
-        }
-    } catch (error) {
-        updateStatus("Connection error. Check your internet.", "red");
-    }
-});
-
-// Helper function to update the status message
-function updateStatus(message, color) {
-    statusBox.innerText = message;
-    statusBox.style.color = color;
-}
-// 2. REGISTER ROUTE: Create a new user
+// 4. REGISTER ROUTE
 app.post('/register', async (req, res) => {
     try {
         const { username, password } = req.body;
+        if (!username || !password) return res.status(400).json({ error: "Missing fields" });
+
         const hashedPassword = await bcrypt.hash(password, 10);
         
         const result = await pool.query(
@@ -117,37 +38,56 @@ app.post('/register', async (req, res) => {
         );
         res.json({ message: "User created!", user: result.rows[0] });
     } catch (err) {
-        console.error("DATABASE ERROR:", err.message); // This prints the REAL error in your terminal
-        res.status(500).json({ error: err.message }); // This sends the REAL error to the browser alert
+        console.error("DB ERROR:", err.message);
+        res.status(500).json({ error: "Username might already exist or DB error" });
     }
 });
 
-// 3. LOGIN ROUTE: Verify user and give them a Token
+// 5. LOGIN ROUTE
 app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    const userResult = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    try {
+        const { username, password } = req.body;
+        const userResult = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
 
-    if (userResult.rows.length === 0) return res.status(400).send("User not found");
+        if (userResult.rows.length === 0) return res.status(400).json({ error: "User not found" });
 
-    const user = userResult.rows[0];
-    const isMatch = await bcrypt.compare(password, user.password_hash);
+        const user = userResult.rows[0];
+        const isMatch = await bcrypt.compare(password, user.password_hash);
 
-    if (isMatch) {
-        // Create a Token (Digital ID) that expires in 2 hours
-        const token = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '2h' });
-        res.json({ token });
-    } else {
-        res.status(400).send("Invalid password");
+        if (isMatch) {
+            const token = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '2h' });
+            res.json({ token, username: user.username });
+        } else {
+            res.status(400).json({ error: "Invalid password" });
+        }
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
     }
 });
 
-// 4. PROTECTED ROUTE: Save task only if user is logged in
-app.post('/start-task', async (req, res) => {
+// 6. FETCH TASKS (Protected)
+app.get('/my-tasks', async (req, res) => {
     const token = req.headers['authorization'];
-    if (!token) return res.status(401).send("Access Denied: No Token Provided");
+    if (!token) return res.status(401).send("No Token Provided");
 
     try {
-        // Verify the "ID Card"
+        const verified = jwt.verify(token, SECRET_KEY);
+        const result = await pool.query(
+            'SELECT * FROM tasks WHERE user_id = $1 ORDER BY created_at DESC',
+            [verified.userId]
+        );
+        res.json(result.rows);
+    } catch (err) {
+        res.status(400).send("Invalid Token");
+    }
+});
+
+// 7. START/SAVE TASK (Protected)
+app.post('/start-task', async (req, res) => {
+    const token = req.headers['authorization'];
+    if (!token) return res.status(401).send("Access Denied");
+
+    try {
         const verified = jwt.verify(token, SECRET_KEY);
         const { taskName } = req.body;
         
@@ -160,62 +100,25 @@ app.post('/start-task', async (req, res) => {
         res.status(400).send("Invalid Token");
     }
 });
-// GET ROUTE: Fetch all tasks for the logged-in user
-app.get('/my-tasks', async (req, res) => {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(401).send("No Token Provided");
 
-    try {
-        const verified = jwt.verify(token, SECRET_KEY);
-        // SQL query to select tasks by user_id, ordered by most recent
-        const result = await pool.query(
-            'SELECT * FROM tasks WHERE user_id = $1 ORDER BY created_at DESC',
-            [verified.userId]
-        );
-        res.json(result.rows);
-    } catch (err) {
-        res.status(400).send("Invalid Token");
-    }
-});
-// DELETE ROUTE: Remove a specific task
+// 8. DELETE TASK
 app.delete('/delete-task/:id', async (req, res) => {
     const token = req.headers['authorization'];
     if (!token) return res.status(401).send("No Token Provided");
 
     try {
         const verified = jwt.verify(token, SECRET_KEY);
-        const { id } = req.params; // Get the ID from the URL (e.g., /delete-task/5)
-        
-        // Only delete the task if it belongs to the logged-in user
+        const { id } = req.params;
         await pool.query(
             'DELETE FROM tasks WHERE id = $1 AND user_id = $2',
             [id, verified.userId]
         );
-        res.json({ message: "Task deleted successfully" });
+        res.json({ message: "Deleted" });
     } catch (err) {
         res.status(400).send("Invalid Token");
     }
 });
-async function saveSession(taskName) {
-    const token = localStorage.getItem('pomoToken');
-    
-    const response = await fetch('http://localhost:3000/tasks', {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // This proves who you are
-        },
-        body: JSON.stringify({ task_name: taskName, duration: 25 })
-    });
 
-    if (response.ok) {
-        console.log("Session saved to Neon!");
-        loadHistory(); // Refresh the list on the screen
-    }
-}
-
+// Start Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
-app.get('/health', (req, res) => {
-    res.send("Server is healthy and awake!");
-});

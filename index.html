@@ -3,207 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PomoFocus Login</title>
+    <title>PomoFocus | Dark Cherry</title>
     <style>
-     /* 1. Global Reset & Body Styling */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', sans-serif;
-}
+        /* 1. Global Reset & Body Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
 
-body {
-    /* Dark Cherry Red / Burgundy */
-    background-color: #5e0b15; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-}
+        body {
+            background-color: #5e0b15; /* Dark Cherry Red Background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-/* 2. The Black Login Card */
-.login-card {
-    background-color: #1a1a1a; /* Sleek Charcoal Black */
-    padding: 45px;
-    border-radius: 24px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-    border: 1px solid #333; /* Subtle border to define the card edges */
-    animation: slideUpFade 0.8s ease-out;
-}
+        /* 2. The Sleek Black Card */
+        .glass-card {
+            background-color: #1a1a1a; /* Charcoal Black */
+            padding: 45px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid #333;
+            animation: slideUpFade 0.8s ease-out;
+        }
 
-h2 {
-    color: #ffffff; /* White text for contrast */
-    margin-bottom: 30px;
-    font-weight: 700;
-    font-size: 2rem;
-}
+        h2 {
+            color: #ffffff;
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-size: 2rem;
+        }
 
-/* 3. Input Fields for Dark Mode */
-.input-group {
-    margin-bottom: 18px;
-}
+        /* 3. Input Groups */
+        .input-group {
+            margin-bottom: 18px;
+        }
 
-input {
-    width: 100%;
-    padding: 15px;
-    border: 1px solid #444;
-    border-radius: 12px;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    background-color: #2a2a2a; /* Darker input background */
-    color: #ffffff; /* White text inside inputs */
-}
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #444;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #2a2a2a;
+            color: #ffffff;
+        }
 
-input::placeholder {
-    color: #888; /* Dimmer placeholder text */
-}
+        input:focus {
+            outline: none;
+            border-color: #D2122E;
+            box-shadow: 0 0 10px rgba(210, 18, 46, 0.3);
+            transform: translateY(-2px);
+        }
 
-input:focus {
-    outline: none;
-    border-color: #D2122E; /* Cherry Red glow on focus */
-    background-color: #333;
-    box-shadow: 0 0 10px rgba(210, 18, 46, 0.3);
-    transform: translateY(-2px);
-}
+        /* 4. Buttons */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
 
-/* 4. Button Group Styling */
-.button-group {
-    margin-top: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+        button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-/* Primary Login Button */
-#loginBtn {
-    width: 100%;
-    padding: 15px;
-    background-color: #D2122E; /* Red button pops on the black card */
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
+        #loginBtn {
+            background-color: #D2122E; /* Cherry Red */
+            color: white;
+            border: none;
+        }
 
-#loginBtn:hover {
-    background-color: #f01e3c;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(210, 18, 46, 0.4);
-}
-/* Secondary Sign Up Button */
-#signupBtn {
-    width: 100%;
-    padding: 12px;
-    background-color: transparent;
-    color: #ffffff; 
-    border: 1px solid #444;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-#signupBtn:hover {
-    background-color: #333;
-    border-color: #666;
-    transform: translateY(-2px);
-}
+        #loginBtn:hover {
+            background-color: #f01e3c;
+            transform: translateY(-2px);
+        }
 
-/* 5. Animations */
-@keyframes slideUpFade {
-    0% {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        #signupBtn {
+            background-color: transparent;
+            color: #ffffff;
+            border: 1px solid #444;
+        }
 
-#statusBox {
-    margin-top: 20px;
-    font-size: 14px;
-    min-height: 1.5em;
-    color: #ccc;
-}        
+        #signupBtn:hover {
+            background-color: #333;
+            transform: translateY(-2px);
+        }
 
+        /* 5. Timer Styling */
+        #timerDisplay {
+            font-size: 4rem;
+            color: #ffffff;
+            font-weight: 700;
+            margin: 20px 0;
+        }
 
+        #statusBox {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            min-height: 1.5em;
+        }
 
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-<div class="login-card">
-    <h2>PomoFocus</h2>
-    <div class="input-group">
-        <input type="text" id="username" placeholder="Username" required>
+
+    <div id="authContainer" class="glass-card">
+        <h2>PomoFocus</h2>
+        <div class="input-group">
+            <input type="text" id="username" placeholder="Username" required>
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" placeholder="Password" required>
+        </div>
+        <div class="button-group">
+            <button id="loginBtn">Login</button>
+            <button id="signupBtn">Sign Up</button>
+        </div>
+        <p id="statusBox"></p>
     </div>
-    <div class="input-group">
-        <input type="password" id="password" placeholder="Password" required>
+
+    <div id="pomoContainer" class="glass-card" style="display: none;">
+        <h2 id="welcomeText">Focus Time</h2>
+        <div id="timerDisplay">25:00</div>
+        <div class="button-group">
+            <button id="startBtn" style="background-color: #27ae60; color: white; border: none;">Start</button>
+            <button id="resetBtn" style="background-color: #555; color: white; border: none;">Reset</button>
+            <button onclick="logout()" style="background-color: transparent; color: #888; border: none; font-size: 0.9rem;">Logout</button>
+        </div>
     </div>
-    
-    <div class="button-group">
-        <button id="loginBtn">Login</button>
-        <button id="signupBtn" class="secondary-btn">Sign Up</button>
-    </div>
-</body>
-    
-    <p id="statusBox"></p>
-</div>
 
     <script>
         // DOM Elements
         const authContainer = document.getElementById('authContainer');
         const pomoContainer = document.getElementById('pomoContainer');
-        const statusBox = document.getElementById('statusMessage');
-        const timerDisplay = document.getElementById('timer');
-        
+        const statusBox = document.getElementById('statusBox');
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const timerText = document.getElementById('timerDisplay');
+
         let timeLeft = 25 * 60;
         let timerId = null;
 
-        // Auto-login check
+        // 1. Auto-Login Check
         if (localStorage.getItem('pomoToken')) {
-            showTimerScreen();
+            showTimer();
         }
 
-        function showTimerScreen() {
+        function showTimer() {
             authContainer.style.display = 'none';
             pomoContainer.style.display = 'block';
-            document.getElementById('welcomeText').textContent = `Hello, ${localStorage.getItem('username')}!`;
-            loadHistory();
+            const user = localStorage.getItem('username') || 'User';
+            document.getElementById('welcomeText').innerText = `Hello, ${user}`;
         }
 
-        // Auth Logic
-        document.getElementById('registerBtn').addEventListener('click', async () => {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            try {
-                const res = await fetch('https://pomo-backend-z8qi.onrender.com/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: user, password: pass })
-                });
-                if (res.ok) {
-                    statusBox.textContent = "Success! Now Login.";
-                    statusBox.className = "status-success";
-                } else {
-                    statusBox.textContent = "Registration failed.";
-                    statusBox.className = "status-error";
-                }
-            } catch (e) { statusBox.className = "status-error"; statusBox.textContent = "Server offline."; }
-        });
+        function updateStatus(msg, color) {
+            statusBox.innerText = msg;
+            statusBox.style.color = color;
+        }
 
-        document.getElementById('loginBtn').addEventListener('click', async () => {
+        // 2. Login Logic
+        loginBtn.addEventListener('click', async () => {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
+
+            if(!user || !pass) return updateStatus("Please fill all fields", "orange");
+
+            updateStatus("Logging in...", "white");
+
             try {
                 const res = await fetch('https://pomo-backend-z8qi.onrender.com/login', {
                     method: 'POST',
@@ -211,26 +197,55 @@ input:focus {
                     body: JSON.stringify({ username: user, password: pass })
                 });
                 const data = await res.json();
+
                 if (res.ok) {
                     localStorage.setItem('pomoToken', data.token);
                     localStorage.setItem('username', user);
-                    showTimerScreen();
+                    showTimer();
                 } else {
-                    statusBox.textContent = "Invalid Login.";
-                    statusBox.className = "status-error";
+                    updateStatus(data.error || "Login failed", "#ff4d4d");
                 }
-            } catch (e) { console.error(e); }
+            } catch (err) {
+                updateStatus("Server is waking up... try again.", "yellow");
+            }
         });
 
-        // Timer Logic
+        // 3. Sign Up Logic
+        signupBtn.addEventListener('click', async () => {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('https://pomo-backend-z8qi.onrender.com/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                if (res.ok) {
+                    updateStatus("Account created! You can login now.", "#2ecc71");
+                } else {
+                    const data = await res.json();
+                    updateStatus(data.error || "Signup failed", "#ff4d4d");
+                }
+            } catch (err) {
+                updateStatus("Connection error", "#ff4d4d");
+            }
+        });
+
+        // 4. Timer Logic
         document.getElementById('startBtn').addEventListener('click', () => {
             if (timerId) return;
             timerId = setInterval(() => {
                 timeLeft--;
-                const mins = Math.floor(timeLeft / 60);
-                const secs = timeLeft % 60;
-                timerDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-                if (timeLeft <= 0) { clearInterval(timerId); alert("Finished!"); }
+                let mins = Math.floor(timeLeft / 60);
+                let secs = timeLeft % 60;
+                timerText.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    timerId = null;
+                    alert("Focus session complete!");
+                }
             }, 1000);
         });
 
@@ -238,21 +253,8 @@ input:focus {
             clearInterval(timerId);
             timerId = null;
             timeLeft = 25 * 60;
-            timerDisplay.textContent = "25:00";
+            timerText.innerText = "25:00";
         });
-
-        async function loadHistory() {
-            const token = localStorage.getItem('pomoToken');
-            const res = await fetch('https://pomo-backend-z8qi.onrender.com/my-tasks', {
-                headers: { 'Authorization': token }
-            });
-            if (res.ok) {
-                const tasks = await res.json();
-                const list = document.getElementById('taskList');
-                list.innerHTML = tasks.map(t => `<li>${t.task_name}</li>`).join('');
-            }
-        }
-
         function logout() {
             localStorage.clear();
             location.reload();
