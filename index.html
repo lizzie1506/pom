@@ -175,7 +175,7 @@
 
     <div id="pomoContainer" class="glass-card" style="display: none;">
         <h2 id="welcomeText">Focus Time</h2>
-        <div id="timerDisplay">25:00</div>
+        <div id="timerDisplay">01:00</div>
         <div class="button-group">
             <button id="startBtn" style="background-color: #27ae60; color: white; border: none;">Start</button>
             <button id="resetBtn" style="background-color: #555; color: white; border: none;">Reset</button>
@@ -198,7 +198,7 @@
         const signupBtn = document.getElementById('signupBtn');
         const timerText = document.getElementById('timerDisplay');
 
-        let timeLeft = 10;
+        let timeLeft = 1*60;
         let timerId = null;
 
         window.onload = async () => {
