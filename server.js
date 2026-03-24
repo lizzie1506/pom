@@ -1,11 +1,15 @@
-const cors = require('cors');
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
-
+const cors = require('cors'); // 1. Import CORS
 const app = express();
-app.use(express.json());
+
+// 2. ENABLE CORS BEFORE ANY ROUTES
+app.use(cors({
+    origin: '*', // This allows ALL origins (good for testing)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(express.json()); // 3. Parse JSON after CORS
 // 1. FIXED CORS: This allows your local computer AND your live site to connect
 app.use(cors()); 
 
