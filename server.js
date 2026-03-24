@@ -42,24 +42,21 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json());
-
+// 1. Grab the elements from the HTML
+const loginBtn = document.getElementById('loginBtn');
 const signupBtn = document.getElementById('signupBtn');
-
-signupBtn.addEventListener('click', async () => {
+const statusBox = document.getElementById('statusBox');
+// 2. The Login Function
+loginBtn.addEventListener('click', async () => {
     const user = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
-    const statusBox = document.getElementById('statusBox');
-
-    // Simple check so we don't send empty data to Render
     if (!user || !pass) {
-        statusBox.innerText = "Please fill in both fields.";
-        statusBox.style.color = "orange";
+        updateStatus("Please enter both fields", "orange");
         return;
     }
 
     try {
-        const response = await fetch('https://pomo-backend-z8qi.onrender.com/register', {
+        const response = await fetch('https://pomo-backend-z8qi.onrender.com/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: user, password: pass })
@@ -68,18 +65,46 @@ signupBtn.addEventListener('click', async () => {
         const data = await response.json();
 
         if (response.ok) {
-            statusBox.style.color = "green";
-            statusBox.innerText = "Account created! You can now login.";
+            // Save the "VIP Pass" (Token) and go to the timer page
+            localStorage.setItem('pomoToken', data.token);
+            updateStatus("Login successful! Redirecting...", "green");
+            setTimeout(() => { window.location.href = 'timer.html'; }, 1500);
         } else {
-            statusBox.style.color = "white"; // Error text should be visible on red or dark background
-            statusBox.innerText = data.error || "Registration failed.";
+            updateStatus(data.error || "Invalid credentials", "red");
         }
     } catch (error) {
-        statusBox.innerText = "Connection error. Is the server awake?";
+        updateStatus("Server is sleeping. Try again in 30 seconds.", "red");
     }
 });
 
+// 3. The Sign Up Function
+signupBtn.addEventListener('click', async () => {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
 
+    try {
+        const response = await fetch('https://pomo-backend-z8qi.onrender.com/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, password: pass })
+        });
+
+        if (response.ok) {
+            updateStatus("Account created! You can now login.", "green");
+        } else {
+            const data = await response.json();
+            updateStatus(data.error || "Registration failed", "red");
+        }
+    } catch (error) {
+        updateStatus("Connection error. Check your internet.", "red");
+    }
+});
+
+// Helper function to update the status message
+function updateStatus(message, color) {
+    statusBox.innerText = message;
+    statusBox.style.color = color;
+}
 // 2. REGISTER ROUTE: Create a new user
 app.post('/register', async (req, res) => {
     try {
@@ -188,5 +213,6 @@ async function saveSession(taskName) {
         loadHistory(); // Refresh the list on the screen
     }
 }
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
