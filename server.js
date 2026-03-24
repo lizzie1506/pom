@@ -165,6 +165,36 @@ app.get('/history', async (req, res) => {
         res.status(401).json({ error: "Token is not valid" });
     }
 });
+// 1. DELETE ALL HISTORY (Clear Task Table for User)
+app.delete('/clear-history', async (req, res) => {
+    const token = req.headers['authorization']?.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        await pool.query('DELETE FROM tasks WHERE user_id = $1', [decoded.userId]);
+        res.json({ message: "History cleared successfully" });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to clear history" });
+    }
+});
+
+// 2. DELETE ACCOUNT (Permanent Removal)
+app.delete('/delete-account', async (req, res) => {
+    const token = req.headers['authorization']?.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        // We delete tasks first, then the user
+        await pool.query('DELETE FROM tasks WHERE user_id = $1', [decoded.userId]);
+        await pool.query('DELETE FROM users WHERE id = $1', [decoded.userId]);
+        
+        res.json({ message: "Account deleted permanently" });
+    } catch (err) {
+        res.status(500).json({ error: "Could not delete account" });
+    }
+});
 
 // Catch-all route to serve index.html for any other request (SPA support)
 app.get('*', (req, res) => {

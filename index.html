@@ -118,6 +118,9 @@
         <div id="historySection">
             <h4 style="margin-bottom: 10px;">Your History</h4>
             <div id="historyList">
+                <button onclick="deleteAccount()" style="margin-top: 30px; background: none; border: none; color: #a33; cursor: pointer; font-size: 0.8rem; text-decoration: underline;">
+        Delete Account Permanently
+    </button>
                 </div>
         </div>
     </div>
@@ -234,6 +237,35 @@
                 </div>
             `).join('');
         }
+        async function clearHistory() {
+    if (!confirm("Are you sure you want to wipe your entire focus history?")) return;
+
+    const token = localStorage.getItem('pomoToken');
+    const res = await fetch(`${API_URL}/clear-history`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (res.ok) {
+        loadHistory(); // Refresh the list (it will now be empty)
+        alert("History cleared.");
+    }
+}
+
+async function deleteAccount() {
+    if (!confirm("WARNING: This will permanently delete your account and all data. Proceed?")) return;
+
+    const token = localStorage.getItem('pomoToken');
+    const res = await fetch(`${API_URL}/delete-account`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (res.ok) {
+        alert("Account deleted. Redirecting...");
+        logout(); // This clears the token and reloads to the login page
+    }
+}
 
         // --- AUTO-LOGIN ON LOAD ---
         window.onload = () => {
