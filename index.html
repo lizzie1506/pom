@@ -3,332 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PomoFocus | Dark Cherry</title>
+    <title>Pomo Focus | Workspace Edition</title>
     <style>
-        /* 1. RESET & LAYOUT */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        /* 1. CORE STYLES */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
         
         body {
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Using the Workspace Background Image */
             background: url('https://t3.ftcdn.net/jpg/03/16/91/28/360_F_316912806_S76reL7shSpxvjI9vGv12S28vK9vO8S6.jpg') no-repeat center center/cover;
+            color: #3d2b1f;
         }
 
-        /* 2. THE GLASS CARD */
-        .auth-container {
-            display: flex;
-            width: 900px;
-            height: 550px;
+        /* 2. GLASS CONTAINERS */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 20px;
-            overflow: hidden;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            background: transparent;
+            overflow: hidden;
+            display: none; /* Hidden by default */
         }
 
-        /* Left Side: Stays clear to show the coffee/keyboard */
+        /* LOGIN BOX */
+        #authContainer { width: 900px; height: 550px; display: flex; }
         .auth-left { flex: 1.2; }
+        .auth-right { flex: 1; padding: 50px; display: flex; flex-direction: column; justify-content: center; background: rgba(255, 255, 255, 0.2); }
 
-        /* Right Side: The Frosted Glass Form */
-        .auth-right {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.25); /* Light transparency */
-            backdrop-filter: blur(12px); /* THE GLASS EFFECT */
-            -webkit-backdrop-filter: blur(12px);
-            padding: 60px 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            border-left: 1px solid rgba(255, 255, 255, 0.3);
-            color: #4a3f35; /* Dark Coffee Brown for text */
-        }
+        /* MAIN APP BOX */
+        #mainApp { width: 450px; padding: 40px; text-align: center; }
 
-        h2 { font-size: 2.2rem; margin-bottom: 5px; color: #3d2b1f; }
-        .subtitle { font-size: 0.9rem; margin-bottom: 35px; color: #6d5f52; }
+        /* 3. TIMER & TEXT STYLES */
+        #timerDisplay { font-size: 5rem; font-weight: bold; margin: 20px 0; color: #3d2b1f; }
+        h2 { margin-bottom: 10px; }
+        .subtitle { font-size: 0.9rem; color: #6d5f52; margin-bottom: 25px; }
 
-        /* 3. INPUT STYLES */
-        .input-group { margin-bottom: 25px; }
-        label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #5d4a3a; }
-        
+        /* 4. FORM & BUTTON ELEMENTS */
         input {
             width: 100%;
-            background: transparent;
-            border: none;
-            border-bottom: 1.5px solid rgba(74, 63, 53, 0.3);
-            padding: 12px 0;
-            color: #3d2b1f;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(74, 63, 53, 0.2);
+            border-radius: 8px;
             outline: none;
-            transition: 0.3s;
+            color: #3d2b1f;
         }
 
-        input:focus { border-bottom-color: #8b5e3c; }
-
-        /* 4. BUTTONS & LINKS */
-        .options { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 30px; }
-        .options a { text-decoration: none; color: #8b5e3c; font-weight: bold; }
-
-        .main-btn {
-            background: #3d2b1f; /* Dark Coffee Color */
-            color: #fdfaf7;
+        .btn {
+            width: 100%;
             padding: 15px;
             border: none;
             border-radius: 8px;
-            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
+            margin-top: 10px;
         }
 
-        .main-btn:hover { background: #5d4a3a; transform: translateY(-2px); }
+        .btn-primary { background: #3d2b1f; color: white; }
+        .btn-primary:hover { background: #5d4a3a; transform: translateY(-2px); }
+        
+        .btn-outline { background: transparent; border: 1px solid #3d2b1f; color: #3d2b1f; }
+        .btn-outline:hover { background: rgba(61, 43, 31, 0.1); }
 
-        .toggle-link { text-align: center; margin-top: 20px; font-size: 0.85rem; }
-        .toggle-link a { color: #8b5e3c; text-decoration: none; font-weight: bold; }
+        /* 5. HISTORY SECTION */
+        #historySection {
+            margin-top: 30px;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+            padding-top: 15px;
+            border-top: 1px solid rgba(74, 63, 53, 0.2);
+        }
+        .history-item {
+            font-size: 0.85rem;
+            padding: 8px;
+            border-bottom: 1px solid rgba(74, 63, 53, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
 
-    <div id="authContainer" class="glass-card">
-        <h2>PomoFocus</h2>
-        <div class="input-group">
-            <input type="text" id="username" placeholder="Username" required>
-        </div>
-        <div class="input-group">
-            <input type="password" id="password" placeholder="Password" required>
-        </div>
-        <div class="button-group">
-            <button id="loginBtn">Login</button>
-            <button id="signupBtn">Sign Up</button>
-        </div>
-        <p id="statusBox"></p>
-    </div>
-
-    <div id="pomoContainer" class="glass-card" style="display: none;">
-        <h2 id="welcomeText">Focus Time</h2>
-        <div id="timerDisplay">01:00</div>
-        <div class="button-group">
-            <button id="startBtn" style="background-color: #27ae60; color: white; border: none;">Start</button>
-            <button id="resetBtn" style="background-color: #555; color: white; border: none;">Reset</button>
-            <button onclick="logout()" style="background-color: transparent; color: #888; border: none; font-size: 0.9rem;">Logout</button>
+    <div id="authContainer" class="glass-panel" style="display: flex;">
+        <div class="auth-left"></div>
+        <div class="auth-right">
+            <h2 id="authTitle">Focus Time</h2>
+            <p class="subtitle">Sign in to start your session.</p>
+            <input type="text" id="userInput" placeholder="Username">
+            <input type="password" id="passInput" placeholder="Password">
+            <button class="btn btn-primary" onclick="handleAuth()" id="authBtn">Log In</button>
+            <p style="margin-top:15px; font-size:0.8rem;">
+                <a href="#" onclick="toggleAuthMode()" id="toggleLink" style="color:#8b5e3c; text-decoration:none;">Create an account</a>
+            </p>
         </div>
     </div>
 
-    <div id="historyContainer" class="glass-card" style="display: none;">
-        <h3>Focus History</h3>
-        <ul id="historyList"></ul>
+    <div id="mainApp" class="glass-panel">
+        <h2>Pomo Focus</h2>
+        <input type="text" id="taskInput" placeholder="What are you working on?">
+        
+        <div id="timerDisplay">25:00</div>
+        
+        <button class="btn btn-primary" onclick="startTimer()" id="startBtn">Start Focus</button>
+        <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
+        <button class="btn btn-outline" onclick="logout()" style="margin-top: 20px; color: #8b5e3c; border-color: #8b5e3c;">Logout</button>
+
+        <div id="historySection">
+            <h4 style="margin-bottom: 10px;">Your History</h4>
+            <div id="historyList">
+                </div>
+        </div>
     </div>
 
     <script>
-        // DOM Elements
-        const authContainer = document.getElementById('authContainer');
-        const pomoContainer = document.getElementById('pomoContainer');
-        const historyContainer = document.getElementById('historyContainer');
-        const statusBox = document.getElementById('statusBox');
-        const loginBtn = document.getElementById('loginBtn');
-        const signupBtn = document.getElementById('signupBtn');
-        const timerText = document.getElementById('timerDisplay');
+        const API_URL = "https://pomo-backend-slsl.onrender.com";
+        let isLogin = true;
+        let timerId;
+        let timeLeft = 25 * 60;
 
-        let timeLeft = 1*60;
-        let timerId = null;
+        // --- AUTH LOGIC ---
+        function toggleAuthMode() {
+            isLogin = !isLogin;
+            document.getElementById('authTitle').innerText = isLogin ? "Focus Time" : "Join Us";
+            document.getElementById('authBtn').innerText = isLogin ? "Log In" : "Sign Up";
+            document.getElementById('toggleLink').innerText = isLogin ? "Create an account" : "Login instead";
+        }
 
-        window.onload = async () => {
-            const token = localStorage.getItem('pomoToken');
-            if (token) {
-                showApp();
-            }
-        };
+        async function handleAuth() {
+            const user = document.getElementById('userInput').value;
+            const pass = document.getElementById('passInput').value;
+            const route = isLogin ? "/login" : "/register";
 
+            const res = await fetch(`${API_URL}${route}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                if(isLogin) {
+                    localStorage.setItem('pomoToken', data.token);
+                    showApp();
+                } else {
+                    alert("Account created! Now login.");
+                    toggleAuthMode();
+                }
+            } else { alert(data.error); }
+        }
+
+        // --- NAVIGATION ---
         function showApp() {
-            authContainer.style.display = 'none';
-            pomoContainer.style.display = 'block';
-            historyContainer.style.display = 'block';
-            const user = localStorage.getItem('username') || 'User';
-            document.getElementById('welcomeText').innerText = `Hello, ${user}`;
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
             loadHistory();
         }
 
-        function updateStatus(msg, color) {
-            statusBox.innerText = msg;
-            statusBox.style.color = color;
-        }
-
-        loginBtn.addEventListener('click', async () => {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-
-            if(!user || !pass) return updateStatus("Please fill all fields", "orange");
-            updateStatus("Logging in...", "white");
-
-            try {
-                const res = await fetch('https://pomo-backend-slsl.onrender.com/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: user, password: pass })
-                });
-                const data = await res.json();
-
-                if (res.ok) {
-                    localStorage.setItem('pomoToken', data.token);
-                    localStorage.setItem('username', user);
-                    showApp();
-                } else {
-                    updateStatus(data.error || "Login failed", "#ff4d4d");
-                }
-            } catch (err) {
-                updateStatus("Server error. Try again.", "yellow");
-            }
-        });
-
-        signupBtn.addEventListener('click', async () => {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-
-            try {
-                const res = await fetch('https://pomo-backend-slsl.onrender.com/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: user, password: pass })
-                });
-
-                if (res.ok) {
-                    updateStatus("Account created! You can login now.", "#2ecc71");
-                } else {
-                    const data = await res.json();
-                    updateStatus(data.error || "Signup failed", "#ff4d4d");
-                }
-            } catch (err) {
-                updateStatus("Connection error", "#ff4d4d");
-            }
-        });
-
-        document.getElementById('startBtn').addEventListener('click', () => {
-            if (timerId) return;
-            timerId = setInterval(() => {
-                timeLeft--;
-                let mins = Math.floor(timeLeft / 60);
-                let secs = timeLeft % 60;
-                timerText.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-                if (timeLeft <= 0) {
-                    clearInterval(timerId);
-                    timerId = null;
-                    saveFocusSession();
-                    alert("Focus session complete!");
-                    timeLeft = 25 * 60;
-                    timerText.innerText = "25:00";
-                }
-            }, 1000);
-        });
-
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            clearInterval(timerId);
-            timerId = null;
-            timeLeft = 25 * 60;
-            timerText.innerText = "25:00";
-        });
-        function updateTimer() {
-    if (timeLeft <= 0) {
-        clearInterval(timerId); // Stop the ticking
-        
-        // Grab the task name from your input box
-        const taskInput = document.getElementById('taskInput');
-        const completedTask = taskInput.value || "Focus Session";
-        
-        // CALL THE SAVE FUNCTION HERE
-        saveSessionToDatabase(completedTask);
-        
-        alert("Time is up! Session saved to history.");
-    } else {
-        timeLeft--;
-        displayTime();
-    }
-}
-
-        
-        async function saveFocusSession() {
-            const token = localStorage.getItem('pomoToken');
-            try {
-                const response = await fetch('https://pomo-backend-slsl.onrender.com/start-task', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ taskName: "Focus Session" })
-                });
-
-                if (response.ok) {
-                    loadHistory();
-                }
-            } catch (err) {
-                console.error("Failed to save session:", err);
-            }
-        }
-        async function saveSessionToDatabase(taskName) {
-    const token = localStorage.getItem('pomoToken');
-    
-    // 1. Point to your Render URL
-    const response = await fetch('https://pomo-backend-slsl.onrender.com/start-task', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        // 2. Send the name of the task you just finished
-        body: JSON.stringify({ taskName: taskName })
-    });
-
-    if (response.ok) {
-        console.log("Session saved to Neon!");
-        // 3. Immediately refresh the list so the user sees it
-        loadHistory(); 
-    } else {
-        console.error("Failed to save session.");
-    }
-}
-
-        async function loadHistory() {
-    const token = localStorage.getItem('pomoToken');
-    
-    // 1. Tell the browser WHERE to go (Your Render URL + /history)
-    const backendURL = "https://pomo-backend-slsl.onrender.com/history"; 
-
-    try {
-        const response = await fetch("https://pomo-backend-slsl.onrender.com/history", {
-            method: 'GET',
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            displayHistory(data); // Call a function to show it on screen
-        } else {
-            console.error("History fetch failed with status:", response.status);
-        }
-    } catch (err) {
-        console.error("Network Error:", err);
-    }
-}
-function displayHistory(data) {
-    const list = document.getElementById('historyList');
-    list.innerHTML = ""; // Clear the old list!
-    
-    data.forEach(session => {
-        const li = document.createElement('li');
-        li.className = "history-item";
-        li.innerHTML = `<strong>${session.task_name}</strong> - ${new Date(session.created_at).toLocaleTimeString()}`;
-        list.appendChild(li);
-    });
-}
-function logout() {
+        function logout() {
             localStorage.clear();
             location.reload();
         }
 
+        // --- TIMER LOGIC ---
+        function startTimer() {
+            if (timerId) return;
+            const btn = document.getElementById('startBtn');
+            btn.innerText = "Focusing...";
+            
+            timerId = setInterval(() => {
+                timeLeft--;
+                updateDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    timerId = null;
+                    saveSession();
+                    alert("Session Complete!");
+                }
+            }, 1000);
+        }
 
+        function resetTimer() {
+            clearInterval(timerId);
+            timerId = null;
+            timeLeft = 25 * 60;
+            updateDisplay();
+            document.getElementById('startBtn').innerText = "Start Focus";
+        }
+
+        function updateDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('timerDisplay').innerText = 
+                `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // --- DATABASE SYNC ---
+        async function saveSession() {
+            const task = document.getElementById('taskInput').value || "Deep Work";
+            const token = localStorage.getItem('pomoToken');
+
+            await fetch(`${API_URL}/start-task`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ taskName: task })
+            });
+            loadHistory();
+        }
+
+        async function loadHistory() {
+            const token = localStorage.getItem('pomoToken');
+            const res = await fetch(`${API_URL}/my-tasks`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            const list = document.getElementById('historyList');
+            list.innerHTML = data.map(t => `
+                <div class="history-item">
+                    <span>${t.task_name}</span>
+                    <span style="color:#8b5e3c">${new Date(t.created_at).toLocaleDateString()}</span>
+                </div>
+            `).join('');
+        }
+
+        // --- AUTO-LOGIN ON LOAD ---
+        window.onload = () => {
+            if (localStorage.getItem('pomoToken')) showApp();
+        };
     </script>
 </body>
 </html>
