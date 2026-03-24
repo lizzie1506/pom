@@ -230,7 +230,7 @@
             updateStatus("Logging in...", "white");
 
             try {
-                const res = await fetch('/login', {
+                const res = await fetch('https://pomo-backend-slsl.onrender.com/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: user, password: pass })
@@ -254,7 +254,7 @@
             const pass = document.getElementById('password').value;
 
             try {
-                const res = await fetch('/register', {
+                const res = await fetch('https://pomo-backend-slsl.onrender.com/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: user, password: pass })
@@ -304,7 +304,7 @@
         async function saveFocusSession() {
             const token = localStorage.getItem('pomoToken');
             try {
-                const response = await fetch('/start-task', {
+                const response = await fetch('https://pomo-backend-slsl.onrender.com/start-task', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
