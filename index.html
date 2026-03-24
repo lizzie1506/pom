@@ -87,6 +87,39 @@
             display: flex;
             justify-content: space-between;
         }
+        /* Full screen dimmed background */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Makes sure it's on top of everything */
+    backdrop-filter: blur(5px);
+}
+
+/* The actual pop-up box */
+.modal-content {
+    width: 350px;
+    padding: 40px;
+    text-align: center;
+    animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.modal-content .icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+/* Simple "Pop" animation */
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
     </style>
 </head>
 <body>
@@ -124,6 +157,14 @@
                 </div>
         </div>
     </div>
+    <div id="celebrationModal" class="modal-overlay">
+    <div class="modal-content glass-panel">
+        <div class="icon">☕</div>
+        <h2>Session Complete!</h2>
+        <p>You’ve earned a break. How about a quick stretch or a refill?</p>
+        <button class="btn btn-primary" onclick="closeModal()">Awesome!</button>
+    </div>
+</div>
 
     <script>
         const API_URL = "https://pomo-backend-slsl.onrender.com";
@@ -187,7 +228,8 @@
                     clearInterval(timerId);
                     timerId = null;
                     saveSession();
-                    alert("Session Complete!");
+                    // Replace the alert line with this:
+document.getElementById('celebrationModal').style.display = 'flex';
                 }
             }, 1000);
         }
@@ -265,6 +307,10 @@ async function deleteAccount() {
         alert("Account deleted. Redirecting...");
         logout(); // This clears the token and reloads to the login page
     }
+}
+function closeModal() {
+    document.getElementById('celebrationModal').style.display = 'none';
+    resetTimer(); // Optional: Resets the timer for the next round
 }
 
         // --- AUTO-LOGIN ON LOAD ---
