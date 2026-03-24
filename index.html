@@ -198,7 +198,7 @@
         const signupBtn = document.getElementById('signupBtn');
         const timerText = document.getElementById('timerDisplay');
 
-        let timeLeft = 25 * 60;
+        let timeLeft = 10;
         let timerId = null;
 
         window.onload = async () => {
@@ -295,12 +295,25 @@
             timeLeft = 25 * 60;
             timerText.innerText = "25:00";
         });
+        function updateTimer() {
+    if (timeLeft <= 0) {
+        clearInterval(timerId); // Stop the ticking
+        
+        // Grab the task name from your input box
+        const taskInput = document.getElementById('taskInput');
+        const completedTask = taskInput.value || "Focus Session";
+        
+        // CALL THE SAVE FUNCTION HERE
+        saveSessionToDatabase(completedTask);
+        
+        alert("Time is up! Session saved to history.");
+    } else {
+        timeLeft--;
+        displayTime();
+    }
+}
 
-        function logout() {
-            localStorage.clear();
-            location.reload();
-        }
-
+        
         async function saveFocusSession() {
             const token = localStorage.getItem('pomoToken');
             try {
@@ -320,6 +333,28 @@
                 console.error("Failed to save session:", err);
             }
         }
+        async function saveSessionToDatabase(taskName) {
+    const token = localStorage.getItem('pomoToken');
+    
+    // 1. Point to your Render URL
+    const response = await fetch('https://pomo-backend-slsl.onrender.com/start-task', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        // 2. Send the name of the task you just finished
+        body: JSON.stringify({ taskName: taskName })
+    });
+
+    if (response.ok) {
+        console.log("Session saved to Neon!");
+        // 3. Immediately refresh the list so the user sees it
+        loadHistory(); 
+    } else {
+        console.error("Failed to save session.");
+    }
+}
 
         async function loadHistory() {
     const token = localStorage.getItem('pomoToken');
@@ -346,6 +381,23 @@
         console.error("Network Error:", err);
     }
 }
+function displayHistory(data) {
+    const list = document.getElementById('historyList');
+    list.innerHTML = ""; // Clear the old list!
+    
+    data.forEach(session => {
+        const li = document.createElement('li');
+        li.className = "history-item";
+        li.innerHTML = `<strong>${session.task_name}</strong> - ${new Date(session.created_at).toLocaleTimeString()}`;
+        list.appendChild(li);
+    });
+}
+function logout() {
+            localStorage.clear();
+            location.reload();
+        }
+
+
     </script>
 </body>
 </html>
