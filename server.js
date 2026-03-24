@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors'); // 1. Import CORS
-const app = express();
+const app = express();//fix 
 
 // 2. ENABLE CORS BEFORE ANY ROUTES
 app.use(cors({
