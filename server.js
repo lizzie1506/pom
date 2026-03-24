@@ -38,7 +38,7 @@ const SECRET_KEY = "your_super_secret_key_here"; // Keep this private!
 
 
 app.use(cors({
-    origin: '*', // This allows 'null' origins and local files to connect
+    origin: 'http://127.0.0.1:5500', // This allows 'null' origins and local files to connect
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
