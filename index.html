@@ -3,72 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pomo - Focus Timer</title>
+    <title>PomoFocus Login</title>
     <style>
-        :root {
-            --joy-peach: #511f21;
-            --joy-lemon: #481d3a;
-            --joy-mint: #221838;
-            --joy-sky: #3e1e35;
-            --glass: rgba(71, 26, 26, 0.25);
-        }
+        /* 1. Global Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
 
-        /* Animations */
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+body {
+    /* Solid Cherry Red Background */
+    background-color: #D2122E; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
 
-        body {
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            font-family: 'Quicksand', sans-serif;
-            color: #4a4a4a;
-            overflow: hidden;
-            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #fbc2eb);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-        }
+/* 2. Centered White Login Card */
+.login-card {
+    background-color: #ffffff;
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+}
 
-        .container {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            padding: 3rem;
-            border-radius: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-            animation: float 6s ease-in-out infinite;
-        }
+h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
 
-        /* Status Messages */
-        #statusMessage {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: none;
-        }
-        .status-success { display: block !important; background: rgba(60, 165, 92, 0.2); color: #3ca55c; border: 1px solid rgba(60, 165, 92, 0.3); }
-        .status-error { display: block !important; background: rgba(255, 95, 109, 0.2); color: #ff5f6d; border: 1px solid rgba(255, 95, 109, 0.3); }
+/* 3. Input Styling */
+.input-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
 
-        h1 { color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 20px; border: none; background: rgba(255, 255, 255, 0.5); font-size: 1rem; }
-        .timer-display { font-size: 5rem; font-weight: 800; color: white; animation: pulse 2s infinite; margin: 20px 0; }
-        
-        button { 
-            width: 100%; padding: 15px; border-radius: 20px; border: none; background: white; 
-            color: #ff9a9e; font-weight: 800; cursor: pointer; transition: 0.3s; margin-top: 10px;
-        }
-        button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        
-        .history-section { margin-top: 20px; text-align: left; max-height: 150px; overflow-y: auto; color: white; }
+input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-top: 5px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #D2122E; /* Border turns red when typing */
+}
+
+/* 4. Login Button */
+#loginBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: #333; /* Dark button looks sleek on white/red */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    margin-top: 1rem;
+}
+
+#loginBtn:hover {
+    background-color: #000;
+}
+
+#loginBtn:active {
+    transform: scale(0.97);
+}
+
+/* 5. Status Text */
+#statusBox {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
     </style>
 </head>
 <body>
@@ -102,6 +123,19 @@
 
         <button onclick="logout()" style="background: rgba(255,0,0,0.2); color: white; margin-top: 20px;">Log Out</button>
     </div>
+    <body>
+    <div class="login-card">
+        <h2>Welcome Back</h2>
+        <div class="input-group">
+            <input type="text" id="username" placeholder="Username">
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" placeholder="Password">
+        </div>
+        <button id="loginBtn">Login</button>
+        <p id="statusBox"></p>
+    </div>
+</body>
 
     <script>
         // DOM Elements
