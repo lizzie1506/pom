@@ -141,6 +141,30 @@ app.get('/history', async (req, res) => {
         res.status(400).send("Invalid Token");
     }
 });
+// 10. GET HISTORY (Read all tasks for the logged-in user)
+app.get('/history', async (req, res) => {
+    // 1. Get the token from the request header
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ error: "No token, authorization denied" });
+
+    try {
+        // 2. Extract the token (removing "Bearer " prefix)
+        const token = authHeader.split(" ")[1];
+        const decoded = jwt.verify(token, SECRET_KEY);
+        
+        // 3. Query the database for this specific user's tasks
+        const result = await pool.query(
+            'SELECT * FROM tasks WHERE user_id = $1 ORDER BY created_at DESC',
+            [decoded.userId]
+        );
+
+        // 4. Send the rows back to the frontend
+        res.json(result.rows);
+    } catch (err) {
+        console.error("History Error:", err.message);
+        res.status(401).json({ error: "Token is not valid" });
+    }
+});
 
 // Catch-all route to serve index.html for any other request (SPA support)
 app.get('*', (req, res) => {
