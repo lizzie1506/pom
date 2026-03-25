@@ -144,6 +144,10 @@
     justify-content: center;
     align-items: center;
     z-index: 2000;
+    pointer-events: none;
+}
+.celebration-overlay[style*="flex"] {
+    pointer-events: auto;
 }
 
 /* 2. The Pop-up Box */
@@ -330,7 +334,11 @@
     </p>
 </div>
 
-    <div id="mainApp" class="glass-panel">
+    </div> </div> <div id="mainApp" class="glass-panel" style="display: none;">
+    </div>
+
+<div id="profilePage" class="glass-panel" style="display: none;">
+    </div>
         <h2>Pomo Focus</h2>
         <input type="text" id="taskInput" placeholder="What are you working on?">
         
@@ -343,7 +351,7 @@
         <button class="btn-outline" onclick="showProfile()" style="margin-top: 20px;">View Profile & History</button>
     </div>
         </div>
-        <div id="profilePage" class="glass-panel" style="width: 500px; padding: 40px; display: none;">
+
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <button onclick="showTimer()" class="back-btn">← Back to Timer</button>
         <h2 style="margin: 0;">Your Profile</h2>
@@ -353,7 +361,6 @@
     <p><strong>Phone:</strong> <span id="profPhone">---</span></p>
     <p><strong>DOB:</strong> <span id="profDOB">---</span></p>
 </div>
-    </div>
 
     <div class="profile-stats">
         <p class="subtitle">Focus History</p>
@@ -489,8 +496,7 @@
 
         const data = await res.json();
         const list = document.getElementById('profileHistoryList');
-        if (!list) return;// Stop the function if the element isn't there!
-        if (list) {
+        if (!list) return; {
             list.innerHTML = data.map(t => `
                 <div class="history-item">
                     <span>${t.task_name}</span>
