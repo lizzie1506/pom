@@ -212,10 +212,39 @@
     transition: 0.3s;
 }
 .danger-link:hover { opacity: 1; color: #d00; }
+/* This code runs ONLY when the screen is smaller than 768px (Tablets/Phones) */
+@media (max-width: 768px) {
+    .auth-container {
+        flex-direction: column; /* Stacks left and right vertically */
+        height: auto; /* Let the height grow based on content */
+        width: 90%;
+        margin: 20px;
+    }
+
+    .auth-left {
+        padding: 40px 20px;
+        flex: none; /* Stops it from trying to take up half the height */
+    }
+
+    .brand-content h1 {
+        font-size: 2rem; /* Shrink text so it fits on a phone screen */
+        letter-spacing: 3px;
+    }
+
+    .auth-right {
+        padding: 30px 20px;
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    #mainApp {
+        width: 95%; /* Make the timer box fill the phone screen */
+    }
+}
     </style>
 </head>
 <body>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <div id="authContainer" class="glass-panel" style="display: flex;">
         <div class="auth-left">
     <div class="brand-content">
