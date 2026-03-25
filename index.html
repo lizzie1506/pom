@@ -467,29 +467,42 @@
             console.error("Profile load failed", err);
         }
     }
+    function showApp() {
+    document.getElementById('authContainer').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    loadHistory(); // <--- IF THIS CRASHES, THE LINE ABOVE MIGHT FAIL
+}
 
     function showTimer() { navigateTo('mainApp'); }
 
     async function loadHistory() {
-        const token = localStorage.getItem('pomoToken');
-        if (!token) return;
+    const token = localStorage.getItem('pomoToken');
+    if (!token) return;
+
+    try {
         const res = await fetch(`${API_URL}/my-tasks`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        
+        // If the server error is here, this stops the "lag"
+        if (!res.ok) throw new Error("History fetch failed");
+
         const data = await res.json();
         const list = document.getElementById('profileHistoryList');
-        
-        if (!data || data.length === 0) {
-            list.innerHTML = "<p style='font-size:0.8rem; color:#999;'>No sessions yet.</p>";
-        } else {
+        if (list) {
             list.innerHTML = data.map(t => `
                 <div class="history-item">
                     <span>${t.task_name}</span>
-                    <span style="color:#8b5e3c">${new Date(t.created_at).toLocaleDateString()}</span>
+                    <span>${new Date(t.created_at).toLocaleDateString()}</span>
                 </div>
             `).join('');
+            const list = document.getElementById('profileHistoryList');
+if (!list) return; // Stop the function if the element isn't there!
         }
+    } catch (err) {
+        console.error("History Error:", err);
     }
+}
 
     // --- TIMER LOGIC ---
     function startTimer() {
