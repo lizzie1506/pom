@@ -95,73 +95,60 @@
 </style>
 </head>
 <body>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <div id="authContainer" class="glass-panel" style="display: flex;">
-        <div class="auth-left">
-    <div class="brand-content">
-        <h1>POMOFOCUS</h1>
-        <div class="divider"></div>
-        <p class="tagline">"Success is the sum of small focus sessions, repeated day in and day out."</p>
-    </div>
-</div>
-        <div class="auth-right">
-    <h2 id="authTitle">Focus Time</h2>
-    <p class="subtitle" id="authSub">Sign in to start your session.</p>
-
-    <input type="text" id="userInput" placeholder="Username">
-    
-    <div id="extraFields" style="display: none;">
-        <input type="email" id="emailInput" placeholder="Email Address">
-        <input type="tel" id="phoneInput" placeholder="Phone Number">
-        <input type="date" id="dobInput" title="Date of Birth">
-    </div>
-
-    <input type="password" id="passInput" placeholder="Password">
-    
-    <button class="btn btn-primary" onclick="handleAuth()" id="authBtn">Log In</button>
-    
-    <p id="forgotPassLink" style="margin-top:10px; font-size:0.8rem; text-align:center;">
-        <a href="#" onclick="handleForgotPassword()" style="color:#8b5e3c; text-decoration:none;">Forgot Password?</a>
-    </p>
-
-    <p style="margin-top:15px; font-size:0.8rem; text-align:center;">
-        <span id="switchText">New here?</span> 
-        <a href="#" onclick="toggleAuthMode()" id="toggleLink" style="color:#8b5e3c; text-decoration:none; font-weight:bold;">Create Account</a>
-    </p>
-</div>
-
-     <div id="mainApp" class="glass-panel" style="display: none;">
-    </div>
-
-<div id="profilePage" class="glass-panel" style="display: none;">
-    </div>
-        <h2>Pomo Focus</h2>
-        <input type="text" id="taskInput" placeholder="What are you working on?">
-        
-        <div id="timerDisplay">01:00</div>
-        
-        <button class="btn btn-primary" onclick="startTimer()" id="startBtn">Start Focus</button>
-        <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
-        <button class="btn btn-outline" onclick="logout()" style="margin-top: 20px; color: #8b5e3c; border-color: #8b5e3c;">Logout</button>
-
-        <button class="btn-outline" onclick="showProfile()" style="margin-top: 20px;">View Profile & History</button>
-    </div>
+    <div class="auth-left">
+        <div class="brand-content">
+            <h1>POMOFOCUS</h1>
+            <div class="divider"></div>
+            <p class="tagline">"Success is the sum of small focus sessions, repeated day in and day out."</p>
         </div>
+    </div>
+    <div class="auth-right">
+        <h2 id="authTitle">Focus Time</h2>
+        <p class="subtitle" id="authSub">Sign in to start your session.</p>
+        <input type="text" id="userInput" placeholder="Username">
+        <div id="extraFields" style="display: none;">
+            <input type="email" id="emailInput" placeholder="Email Address">
+            <input type="tel" id="phoneInput" placeholder="Phone Number">
+            <input type="date" id="dobInput" title="Date of Birth">
+        </div>
+        <input type="password" id="passInput" placeholder="Password">
+        <button class="btn btn-primary" onclick="handleAuth()" id="authBtn">Log In</button>
+        <p id="forgotPassLink" style="margin-top:10px; font-size:0.8rem; text-align:center;">
+            <a href="#" onclick="handleForgotPassword()" style="color:#8b5e3c; text-decoration:none;">Forgot Password?</a>
+        </p>
+        <p style="margin-top:15px; font-size:0.8rem; text-align:center;">
+            <span id="switchText">New here?</span> 
+            <a href="#" onclick="toggleAuthMode()" id="toggleLink" style="color:#8b5e3c; text-decoration:none; font-weight:bold;">Create Account</a>
+        </p>
+    </div>
+</div>
 
+<div id="mainApp" class="glass-panel" style="display: none;">
+    <h2>Pomo Focus</h2>
+    <input type="text" id="taskInput" placeholder="What are you working on?">
+    <div id="timerDisplay">01:00</div>
+    <button class="btn btn-primary" onclick="startTimer()" id="startBtn">Start Focus</button>
+    <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
+    <button class="btn-outline" onclick="showProfile()" style="margin-top: 20px;">View Profile & History</button>
+    <button class="btn btn-outline" onclick="logout()" style="margin-top: 10px; color: #8b5e3c; border-color: #8b5e3c;">Logout</button>
+</div>
+
+<div id="profilePage" class="glass-panel" style="display: none; width: 500px; padding: 40px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <button onclick="showTimer()" class="back-btn">← Back to Timer</button>
         <h2 style="margin: 0;">Your Profile</h2>
-        <div class="user-details-card" style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
-    <p><strong>Username:</strong> <span id="profUser">---</span></p>
-    <p><strong>Email:</strong> <span id="profEmail">---</span></p>
-    <p><strong>Phone:</strong> <span id="profPhone">---</span></p>
-    <p><strong>DOB:</strong> <span id="profDOB">---</span></p>
-</div>
-
+    </div>
+    <div class="user-details-card" style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
+        <p><strong>Username:</strong> <span id="profUser">---</span></p>
+        <p><strong>Email:</strong> <span id="profEmail">---</span></p>
+        <p><strong>Phone:</strong> <span id="profPhone">---</span></p>
+        <p><strong>DOB:</strong> <span id="profDOB">---</span></p>
+    </div>
     <div class="profile-stats">
         <p class="subtitle">Focus History</p>
-        <div id="profileHistoryList" class="scroll-list">
-            </div>
+        <div id="profileHistoryList" class="scroll-list"></div>
         <button onclick="clearHistory()" class="btn-text">Clear All History</button>
     </div>
 
@@ -170,7 +157,7 @@
         <button class="btn-danger" onclick="deleteAccount()">Delete Account Permanently</button>
     </div>
 </div>
-    </div>
+
 <div id="celebrationModal" class="celebration-overlay">
     <div class="celebration-content">
         <div class="emoji-bounce">🎉</div>
@@ -178,7 +165,7 @@
         <h2 class="fade-in-text">SESSION COMPLETE</h2>
         <div class="divider-grow"></div>
         <p class="take-break">Time for a coffee break?</p>
-        <button class="btn-continue"onclick="closeModal()">Close</button>
+        <button class="btn-continue" onclick="closeModal()">Close</button>
     </div>
 </div>
 
