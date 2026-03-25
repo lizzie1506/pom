@@ -378,42 +378,44 @@
         <button class="btn-continue" onclick="closeModal()">CONTINUE</button>
     </div>
 </div>
-
-    <script>
-        const API_URL = "https://pomo-backend-slsl.onrender.com";
-        let isLogin = true;
-        let timerId;
-        let timeLeft = 1*60;
-// --- AUTH LOGIC ---
-function toggleAuthMode() {
-    isLogin = !isLogin; // Flips true to false, or false to true
+<script>
+    const API_URL = "https://pomo-backend-slsl.onrender.com";
     
-    const extra = document.getElementById('extraFields');
-    const authTitle = document.getElementById('authTitle');
-    const authBtn = document.getElementById('authBtn');
-    const toggleLink = document.getElementById('toggleLink');
-    const switchText = document.getElementById('switchText');
-    const forgotLink = document.getElementById('forgotPassLink');
+    // --- GLOBAL STATE ---
+    let isLogin = true; 
+    let timerId;
+    let timeLeft = 25 * 60; // Standard 25 minutes
 
-    if (isLogin) {
-        // --- SWITCH TO LOGIN VIEW ---
-        authTitle.innerText = "Focus Time";
-        authBtn.innerText = "Log In";
-        switchText.innerText = "New here?";
-        toggleLink.innerText = "Create Account";
-        extra.style.display = 'none'; // Hide Email, Phone, DOB
-        if(forgotLink) forgotLink.style.display = 'block'; 
-    } else {
-        // --- SWITCH TO SIGN UP VIEW ---
-        authTitle.innerText = "Join Us";
-        authBtn.innerText = "Sign Up";
-        switchText.innerText = "Already have an account?";
-        toggleLink.innerText = "Login instead";
-        extra.style.display = 'block'; // Show Email, Phone, DOB
-        if(forgotLink) forgotLink.style.display = 'none';
+    // --- VIEW NAVIGATION ---
+    function toggleAuthMode() {
+        isLogin = !isLogin;
+        
+        const extra = document.getElementById('extraFields');
+        const authTitle = document.getElementById('authTitle');
+        const authBtn = document.getElementById('authBtn');
+        const toggleLink = document.getElementById('toggleLink');
+        const switchText = document.getElementById('switchText');
+        const forgotLink = document.getElementById('forgotPassLink');
+
+        if (isLogin) {
+            authTitle.innerText = "Focus Time";
+            authBtn.innerText = "Log In";
+            switchText.innerText = "New here?";
+            toggleLink.innerText = "Create Account";
+            extra.style.display = 'none';
+            if(forgotLink) forgotLink.style.display = 'block';
+        } else {
+            authTitle.innerText = "Join Us";
+            authBtn.innerText = "Sign Up";
+            switchText.innerText = "Already have an account?";
+            toggleLink.innerText = "Login instead";
+            extra.style.display = 'block';
+            if(forgotLink) forgotLink.style.display = 'none';
+        }
     }
-}
-        async function handleAuth() {
+
+    // --- AUTHENTICATION ---
+    async function handleAuth() {
             const user = document.getElementById('userInput').value;
             const pass = document.getElementById('passInput').value;
             const route = isLogin ? "/login" : "/register";
