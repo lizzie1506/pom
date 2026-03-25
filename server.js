@@ -40,8 +40,9 @@ app.post('/register', async (req, res) => {
         );
         res.status(201).json({ message: "User registered!" });
     } catch (err) {
-        res.status(400).json({ error: "Username or Email already exists" });
-    }
+    console.error(err); // This prints the REAL error in your Render/VS Code terminal
+    res.status(500).json({ error: err.message }); // This sends the REAL error to your browser alert
+}
 });
 
 // 5. LOGIN ROUTE
