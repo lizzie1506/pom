@@ -170,6 +170,18 @@
     opacity: 0;
     animation: fadeIn 0.8s forwards 0.4s; /* Starts after the bounce */
 }
+.divider-grow {
+    width: 0;
+    height: 3px;
+    background: #8b5e3c;
+    margin: 15px auto;
+    border-radius: 2px;
+    animation: growLine 0.8s forwards 0.6s; /* Grows after the text appears */
+}
+
+@keyframes growLine {
+    to { width: 80px; }
+}
 
 /* 3. The Animations */
 @keyframes superPop {
@@ -286,14 +298,6 @@
     </div>
         </div>
     </div>
-    <div id="celebrationModal" class="modal-overlay">
-    <div class="modal-content glass-panel">
-        <div class="icon">☕</div>
-        <h2>Session Complete!</h2>
-        <p>You’ve earned a break. How about a quick stretch or a refill?</p>
-        <button class="btn btn-primary" onclick="closeModal()">Awesome!</button>
-    </div>
-</div>
 <div id="celebrationModal" class="celebration-overlay">
     <div class="celebration-content">
         <div class="emoji-bounce">🎉</div>
