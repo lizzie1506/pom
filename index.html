@@ -305,16 +305,30 @@
     </div>
 </div>
         <div class="auth-right">
-            <h2 id="authTitle">Focus Time</h2>
-            <p class="subtitle">Sign in to start your session.</p>
-            <input type="text" id="userInput" placeholder="Username">
-            <input type="password" id="passInput" placeholder="Password">
-            <button class="btn btn-primary" onclick="handleAuth()" id="authBtn">Log In</button>
-            <p style="margin-top:15px; font-size:0.8rem;">
-                <a href="#" onclick="toggleAuthMode()" id="toggleLink" style="color:#8b5e3c; text-decoration:none;">Create an account</a>
-            </p>
-        </div>
+    <h2 id="authTitle">Focus Time</h2>
+    <p class="subtitle" id="authSub">Sign in to start your session.</p>
+
+    <input type="text" id="userInput" placeholder="Username">
+    
+    <div id="extraFields" style="display: none;">
+        <input type="email" id="emailInput" placeholder="Email Address">
+        <input type="tel" id="phoneInput" placeholder="Phone Number">
+        <input type="date" id="dobInput" title="Date of Birth">
     </div>
+
+    <input type="password" id="passInput" placeholder="Password">
+    
+    <button class="btn btn-primary" onclick="handleAuth()" id="authBtn">Log In</button>
+    
+    <p id="forgotPassLink" style="margin-top:10px; font-size:0.8rem; text-align:center;">
+        <a href="#" onclick="handleForgotPassword()" style="color:#8b5e3c; text-decoration:none;">Forgot Password?</a>
+    </p>
+
+    <p style="margin-top:15px; font-size:0.8rem; text-align:center;">
+        <span id="switchText">New here?</span> 
+        <a href="#" onclick="toggleAuthMode()" id="toggleLink" style="color:#8b5e3c; text-decoration:none; font-weight:bold;">Create Account</a>
+    </p>
+</div>
 
     <div id="mainApp" class="glass-panel">
         <h2>Pomo Focus</h2>
@@ -333,6 +347,12 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <button onclick="showTimer()" class="back-btn">← Back to Timer</button>
         <h2 style="margin: 0;">Your Profile</h2>
+        <div class="user-details-card" style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
+    <p><strong>Username:</strong> <span id="profUser">---</span></p>
+    <p><strong>Email:</strong> <span id="profEmail">---</span></p>
+    <p><strong>Phone:</strong> <span id="profPhone">---</span></p>
+    <p><strong>DOB:</strong> <span id="profDOB">---</span></p>
+</div>
     </div>
 
     <div class="profile-stats">
@@ -405,9 +425,26 @@
 }
 
 function showProfile() {
+    async function showProfile() {
+    const token = localStorage.getItem('pomoToken');
+    
+    // 1. Fetch user info from a new /me endpoint (you'll need to create this)
+    const res = await fetch(`${API_URL}/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const userData = await res.json();
+
+    // 2. Fill the placeholders
+    document.getElementById('profUser').innerText = userData.username;
+    document.getElementById('profEmail').innerText = userData.email || "Not provided";
+    document.getElementById('profPhone').innerText = userData.phone || "Not provided";
+    document.getElementById('profDOB').innerText = new Date(userData.dob).toLocaleDateString();
+
+    // 3. Show the page
     document.getElementById('mainApp').style.display = 'none';
     document.getElementById('profilePage').style.display = 'block';
     loadHistory(); 
+}
 }
 
 function showTimer() {
@@ -531,6 +568,96 @@ function closeModal() {
     document.getElementById('celebrationModal').style.display = 'none';
     resetTimer(); // Optional: Resets the timer for the next round
 }
+function toggleAuthMode() {
+    isLogin = !isLogin;
+    const extra = document.getElementById('extraFields');
+    const forgotLink = document.getElementById('forgotPassLink');
+    
+    extra.style.display = isLogin ? 'none' : 'block';
+    forgotLink.style.display = isLogin ? 'block' : 'none'; // Hide forgot pass during signup
+    
+    document.getElementById('authTitle').innerText = isLogin ? "Focus Time" : "Join Us";
+    document.getElementById('authBtn').innerText = isLogin ? "Log In" : "Sign Up";
+    document.getElementById('toggleLink').innerText = isLogin ? "Create Account" : "Login instead";
+}
+async function handleForgotPassword() {
+    const username = prompt("Enter Username:");
+    const email = prompt("Enter Registered Email:");
+    const dob = prompt("Enter DOB (YYYY-MM-DD):");
+
+    if(!username || !email || !dob) return;
+
+    // 1. Verify
+    const res = await fetch(`${API_URL}/reset-password-verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, dob })
+    });
+
+    if (res.ok) {
+        // 2. If verified, ask for new password
+        const newPassword = prompt("Verified! Enter new password:");
+        if(!newPassword) return;
+
+        const updateRes = await fetch(`${API_URL}/update-password-final`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, newPassword })
+        });
+
+        if (updateRes.ok) alert("Password changed! You can now log in.");
+    } else {
+        alert("Verification failed. Incorrect details.");
+    }
+}
+// HELPER: Hide all pages and show only one
+function navigateTo(pageId) {
+    const pages = ['authContainer', 'mainApp', 'profilePage'];
+    pages.forEach(id => {
+        document.getElementById(id).style.display = (id === pageId) ? 'flex' : 'none';
+        if (id === 'profilePage' && pageId === 'profilePage') {
+            document.getElementById(id).style.display = 'block'; // Profile uses block, others use flex
+        }
+    });
+}
+
+// Update your existing showProfile to use navigation
+async function showProfile() {
+    const token = localStorage.getItem('pomoToken');
+    if (!token) return logout();
+
+    try {
+        const res = await fetch(`${API_URL}/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const userData = await res.json();
+
+        // Update UI placeholders
+        document.getElementById('profUser').innerText = userData.username;
+        document.getElementById('profEmail').innerText = userData.email || "N/A";
+        document.getElementById('profPhone').innerText = userData.phone || "N/A";
+        document.getElementById('profDOB').innerText = userData.dob ? new Date(userData.dob).toLocaleDateString() : "N/A";
+
+        navigateTo('profilePage');
+        loadHistory();
+    } catch (err) {
+        console.error("Profile load failed", err);
+    }
+}
+    const data = await res.json();
+    if (res.ok) {
+        const newPass = prompt("Identity Verified! Enter your NEW password:");
+        // Call a second endpoint to actually save the new password
+        await fetch(`${API_URL}/update-password`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, newPass })
+        });
+        alert("Password updated successfully!");
+    } else {
+        alert("Verification failed. Details do not match.");
+    }
+
 
         // --- AUTO-LOGIN ON LOAD ---
         window.onload = () => {

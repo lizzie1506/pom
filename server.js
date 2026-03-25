@@ -31,20 +31,16 @@ app.get('/health', (req, res) => {
 
 // 4. REGISTER ROUTE
 app.post('/register', async (req, res) => {
+    const { username, password, email, phone, dob } = req.body;
     try {
-        const { username, password } = req.body;
-        if (!username || !password) return res.status(400).json({ error: "Missing fields" });
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        
-        const result = await pool.query(
-            'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username',
-            [username, hashedPassword]
+        // We add email, phone, and dob to the query
+        await pool.query(
+            'INSERT INTO users (username, password, email, phone, dob) VALUES ($1, $2, $3, $4, $5)',
+            [username, password, email, phone, dob]
         );
-        res.json({ message: "User created!", user: result.rows[0] });
+        res.status(201).json({ message: "User registered!" });
     } catch (err) {
-        console.error("DB ERROR:", err.message);
-        res.status(500).json({ error: "Username might already exist or DB error" });
+        res.status(400).json({ error: "Username or Email already exists" });
     }
 });
 
@@ -70,7 +66,24 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+app.post('/reset-password-verify', async (req, res) => {
+    const { username, email, dob } = req.body;
+    const user = await pool.query(
+        'SELECT * FROM users WHERE username = $1 AND email = $2 AND dob = $3',
+        [username, email, dob]
+    );
 
+    if (user.rows.length > 0) {
+        res.json({ success: true });
+    } else {
+        res.status(401).json({ error: "Verification failed. Details do not match." });
+    }
+});
+app.put('/update-password', async (req, res) => {
+    const { username, newPassword } = req.body;
+    await pool.query('UPDATE users SET password = $1 WHERE username = $2', [newPassword, username]);
+    res.json({ message: "Password updated!" });
+});
 // 6. FETCH TASKS (Protected)
 app.get('/my-tasks', async (req, res) => {
     const token = req.headers['authorization'];
@@ -122,6 +135,32 @@ app.delete('/delete-task/:id', async (req, res) => {
         res.json({ message: "Deleted" });
     } catch (err) {
         res.status(400).send("Invalid Token");
+    }
+});
+// GET USER DETAILS FOR PROFILE
+app.get('/me', async (req, res) => {
+    // 1. Get the token from the request header
+    const token = req.headers['authorization']?.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "No token provided" });
+
+    try {
+        // 2. Decode the token to find the User ID
+        const decoded = jwt.verify(token, SECRET_KEY);
+        
+        // 3. Query the database for that specific ID
+        const result = await pool.query(
+            'SELECT username, email, phone, dob FROM users WHERE id = $1', 
+            [decoded.userId]
+        );
+
+        if (result.rows.length > 0) {
+            // 4. Send the user object back to the frontend
+            res.json(result.rows[0]);
+        } else {
+            res.status(404).json({ error: "User not found" });
+        }
+    } catch (err) {
+        res.status(401).json({ error: "Invalid token" });
     }
 });
 
@@ -195,10 +234,55 @@ app.delete('/delete-account', async (req, res) => {
         res.status(500).json({ error: "Could not delete account" });
     }
 });
+app.post('/reset-password-verify', async (req, res) => {
+    const { username, email, dob } = req.body;
+    try {
+        const result = await pool.query(
+            'SELECT * FROM users WHERE username = $1 AND email = $2 AND dob = $3',
+            [username, email, dob]
+        );
 
+        if (result.rows.length > 0) {
+            res.json({ success: true, message: "Identity Verified" });
+        } else {
+            res.status(401).json({ error: "Details do not match our records." });
+        }
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+app.put('/update-password-final', async (req, res) => {
+    const { username, newPassword } = req.body;
+    try {
+        await pool.query(
+            'UPDATE users SET password = $1 WHERE username = $2',
+            [newPassword, username]
+        );
+        res.json({ message: "Password updated successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: "Could not update password" });
+    }
+});
 // Catch-all route to serve index.html for any other request (SPA support)
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+// MIDDLEWARE: Check if user is logged in
+const authenticateToken = (req, res, next) => {
+    const token = req.headers['authorization']?.split(" ")[1];
+    if (!token) return res.sendStatus(401);
+
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
+// Use the middleware for private routes
+app.get('/me', authenticateToken, async (req, res) => {
+    const result = await pool.query('SELECT username, email, phone, dob FROM users WHERE id = $1', [req.user.userId]);
+    res.json(result.rows[0]);
 });
 
 // Export for Vercel
