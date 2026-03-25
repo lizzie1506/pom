@@ -47,26 +47,43 @@ app.post('/register', async (req, res) => {
 
 // 5. LOGIN ROUTE
 app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
     try {
-        const { username, password } = req.body;
-        const userResult = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+        // 1. Search for the user by username
+        // Change 'password_hash' to 'password' in the SELECT query below
+        const result = await pool.query(
+            'SELECT id, username, password FROM users WHERE username = $1', 
+            [username]
+        );
 
-        if (userResult.rows.length === 0) return res.status(400).json({ error: "User not found" });
-
-        const user = userResult.rows[0];
-        const isMatch = await bcrypt.compare(password, user.password_hash);
-
-        if (isMatch) {
-            const token = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '2h' });
-            res.json({ token, username: user.username });
-        } else {
-            res.status(400).json({ error: "Invalid password" });
+        if (result.rows.length === 0) {
+            return res.status(401).json({ error: "Invalid username or password" });
         }
+
+        const user = result.rows[0];
+
+        // 2. Compare the password (Plain text for now)
+        // Ensure this matches the column name 'password' from your SQL result
+        if (password !== user.password) {
+            return res.status(401).json({ error: "Invalid username or password" });
+        }
+
+        // 3. Generate the Token
+        const token = jwt.sign(
+            { userId: user.id }, 
+            process.env.JWT_SECRET || 'your_secret_key', 
+            { expiresIn: '24h' }
+        );
+
+        res.json({ message: "Logged in!", token });
+
     } catch (err) {
-        console.error("LOGIN ERROR:", err.message);
-        res.status(500).json({ error: "Server error" });
+        console.error(err);
+        res.status(500).json({ error: "Server error during login" });
     }
 });
+
 app.post('/reset-password-verify', async (req, res) => {
     const { username, email, dob } = req.body;
     const user = await pool.query(
