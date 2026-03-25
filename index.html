@@ -5,298 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pomo Focus | Workspace Edition</title>
     <style>
-        /* 1. CORE STYLES */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        
-        body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: url('https://img.freepik.com/premium-photo/uncluttered-office-setup-aesthetic-top-view-desk-with-computer-laptop-office-equipment-spac_1000124-67783.jpg') no-repeat center center/cover;
-            color: #3d2b1f;
-        }
-
-        /* 2. GLASS CONTAINERS */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-            display: none; /* Hidden by default */
-        }
-
-        /* LOGIN BOX */
-        #authContainer { width: 900px; height: 550px; display: flex; }
-        .auth-left { flex: 1.2; }
-        .auth-right { flex: 1; padding: 50px; display: flex; flex-direction: column; justify-content: center; background: rgba(255, 255, 255, 0.2); }
-
-        /* MAIN APP BOX */
-        #mainApp { width: 450px; padding: 40px; text-align: center; }
-
-        /* 3. TIMER & TEXT STYLES */
-        #timerDisplay { font-size: 5rem; font-weight: bold; margin: 20px 0; color: #3d2b1f; }
-        h2 { margin-bottom: 10px; }
-        .subtitle { font-size: 0.9rem; color: #6d5f52; margin-bottom: 25px; }
-
-        /* 4. FORM & BUTTON ELEMENTS */
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            background: rgba(255,255,255,0.5);
-            border: 1px solid rgba(74, 63, 53, 0.2);
-            border-radius: 8px;
-            outline: none;
-            color: #3d2b1f;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
-
-        .btn-primary { background: #3d2b1f; color: white; }
-        .btn-primary:hover { background: #5d4a3a; transform: translateY(-2px); }
-        
-        .btn-outline { background: transparent; border: 1px solid #3d2b1f; color: #3d2b1f; }
-        .btn-outline:hover { background: rgba(61, 43, 31, 0.1); }
-
-        /* 5. HISTORY SECTION */
-        #historySection {
-            margin-top: 30px;
-            max-height: 200px;
-            overflow-y: auto;
-            text-align: left;
-            padding-top: 15px;
-            border-top: 1px solid rgba(74, 63, 53, 0.2);
-        }
-        .history-item {
-            font-size: 0.85rem;
-            padding: 8px;
-            border-bottom: 1px solid rgba(74, 63, 53, 0.1);
-            display: flex;
-            justify-content: space-between;
-        }
-        .auth-left {
-    flex: 1.2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-}
-
-.brand-content {
-    text-align: center;
-    color: #3d2b1f; /* Matching the coffee brown */
-    animation: fadeIn 1.2s ease-out;
-}
-
-.brand-content h1 {
-    font-size: 3.5rem;
-    letter-spacing: 8px;
-    font-weight: 800;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(255,255,255,0.5);
-}
-
-.brand-content .divider {
-    width: 60px;
-    height: 3px;
-    background: #8b5e3c;
-    margin: 15px auto;
-    border-radius: 2px;
-}
-
-.brand-content .tagline {
-    font-family: 'Georgia', serif;
-    font-style: italic;
-    font-size: 1.2rem;
-    max-width: 300px;
-    line-height: 1.6;
-    opacity: 0.9;
-}
-
-/* Smooth fade-in for the branding */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateX(-20px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-        /* 1. The Overlay (Glass Blur, no dark dimming) */
-.celebration-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(8px);
-    display: none; /* Controlled by JS */
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    pointer-events: none;
-}
-.celebration-overlay[style*="flex"] {
-    pointer-events: auto;
-}
-
-/* 2. The Pop-up Box */
-.celebration-content {
-    text-align: center;
-    color: #3d2b1f;
-    animation: superPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49);
-}
-
-.emoji-bounce { font-size: 4rem; animation: float 2s infinite ease-in-out; }
-
-.bounce-text {
-    font-size: 4rem;
-    letter-spacing: 10px;
-    font-weight: 900;
-    color: #3d2b1f;
-    margin: 10px 0;
-}
-
-.fade-in-text {
-    font-size: 1.2rem;
-    letter-spacing: 4px;
-    color: #8b5e3c;
-    opacity: 0;
-    animation: fadeIn 0.8s forwards 0.4s; /* Starts after the bounce */
-}
-.divider-grow {
-    width: 0;
-    height: 3px;
-    background: #8b5e3c;
-    margin: 15px auto;
-    border-radius: 2px;
-    animation: growLine 0.8s forwards 0.6s; /* Grows after the text appears */
-}
-
-@keyframes growLine {
-    to { width: 80px; }
-}
-
-/* 3. The Animations */
-@keyframes superPop {
-    0% { transform: scale(0); opacity: 0; }
-    70% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes fadeIn {
-    to { opacity: 1; transform: translateY(-5px); }
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-}
-
-.btn-continue {
-    margin-top: 30px;
-    background: #3d2b1f;
-    color: white;
-    border: none;
-    padding: 12px 40px;
-    border-radius: 50px;
-    font-weight: bold;
-    cursor: pointer;
-    letter-spacing: 2px;
-    transition: 0.3s;
-}
-
-.btn-continue:hover { transform: scale(1.1); background: #5d4a3a; }
-.danger-link {
-    background: none;
-    border: none;
-    color: #a33;
-    cursor: pointer;
-    font-size: 0.75rem;
-    text-decoration: underline;
-    opacity: 0.7;
-    transition: 0.3s;
-}
-.danger-link:hover { opacity: 1; color: #d00; }
-/* This code runs ONLY when the screen is smaller than 768px (Tablets/Phones) */
-@media (max-width: 768px) {
-    .auth-container {
-        flex-direction: column; /* Stacks left and right vertically */
-        height: auto; /* Let the height grow based on content */
-        width: 90%;
-        margin: 20px;
+    /* 1. RESET & FOUNDATION */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+    
+    body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: url('https://img.freepik.com/premium-photo/uncluttered-office-setup-aesthetic-top-view-desk-with-computer-laptop-office-equipment-spac_1000124-67783.jpg') no-repeat center center/cover;
+        color: #3d2b1f;
+        overflow: hidden;
     }
 
-    .auth-left {
-        padding: 40px 20px;
-        flex: none; /* Stops it from trying to take up half the height */
+    /* 2. THE GLASS PANEL SYSTEM (The "Lag" Killer) */
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        display: none; /* JS toggles this to 'flex' or 'block' */
+        transition: opacity 0.4s ease, transform 0.4s ease;
     }
 
-    .brand-content h1 {
-        font-size: 2rem; /* Shrink text so it fits on a phone screen */
-        letter-spacing: 3px;
+    /* VIEW SIZES */
+    #authContainer { width: 900px; height: 550px; display: flex; flex-direction: row; }
+    #mainApp { width: 450px; padding: 40px; text-align: center; }
+    #profilePage { width: 500px; padding: 40px; }
+
+    /* 3. BRANDING & AUTH STYLES */
+    .auth-left { flex: 1.2; display: flex; align-items: center; justify-content: center; padding: 40px; }
+    .brand-content { text-align: center; animation: fadeIn 1.2s ease-out; }
+    .brand-content h1 { font-size: 3.5rem; letter-spacing: 8px; font-weight: 800; text-shadow: 2px 2px 4px rgba(255,255,255,0.5); }
+    .divider { width: 60px; height: 3px; background: #8b5e3c; margin: 15px auto; border-radius: 2px; }
+    .tagline { font-family: 'Georgia', serif; font-style: italic; font-size: 1.1rem; opacity: 0.9; line-height: 1.6; }
+
+    .auth-right { flex: 1; padding: 50px; display: flex; flex-direction: column; justify-content: center; background: rgba(255, 255, 255, 0.2); }
+
+    /* 4. TIMER & INTERFACE */
+    #timerDisplay { font-size: 5rem; font-weight: bold; margin: 20px 0; color: #3d2b1f; }
+    
+    input {
+        width: 100%; padding: 12px; margin-bottom: 15px;
+        background: rgba(255,255,255,0.5); border: 1px solid rgba(74, 63, 53, 0.2);
+        border-radius: 8px; outline: none;
     }
 
-    .auth-right {
-        padding: 30px 20px;
-        border-left: none;
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    .btn { width: 100%; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; border: none; }
+    .btn-primary { background: #3d2b1f; color: white; }
+    .btn-primary:hover { background: #5d4a3a; transform: translateY(-2px); }
+    .btn-outline { background: transparent; border: 1px solid #3d2b1f; color: #3d2b1f; }
+
+    /* 5. CELEBRATION MODAL (The "Ghost" Fix) */
+    .celebration-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+        display: none; justify-content: center; align-items: center;
+        z-index: 9999; pointer-events: none; /* Stops the ghost button lag */
     }
     
-    #mainApp {
-        width: 95%; /* Make the timer box fill the phone screen */
+    /* Reveal button safely only when active */
+    .celebration-overlay[style*="flex"] { pointer-events: auto; }
+
+    .celebration-content { text-align: center; color: #3d2b1f; animation: superPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49); }
+    .emoji-bounce { font-size: 4rem; animation: float 2s infinite ease-in-out; }
+    .bounce-text { font-size: 4rem; letter-spacing: 10px; font-weight: 900; }
+    .divider-grow { width: 0; height: 3px; background: #8b5e3c; margin: 15px auto; animation: growLine 0.8s forwards 0.6s; }
+
+    /* 6. ALL KEYFRAME ANIMATIONS */
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+    @keyframes growLine { to { width: 80px; } }
+    @keyframes superPop { 0% { transform: scale(0); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+
+    /* 7. RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+        #authContainer { flex-direction: column; width: 90%; height: auto; }
+        .auth-left, .auth-right { flex: none; width: 100%; padding: 30px; }
+        .brand-content h1 { font-size: 2.2rem; }
+        #mainApp, #profilePage { width: 95%; margin: 10px; }
     }
-}
-.back-btn {
-    background: none;
-    border: none;
-    color: #8b5e3c;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 0.9rem;
-}
 
-.scroll-list {
-    max-height: 250px;
-    overflow-y: auto;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-.btn-text {
-    background: none;
-    border: none;
-    color: #8b5e3c;
-    text-decoration: underline;
-    cursor: pointer;
-    font-size: 0.8rem;
-}
-
-.btn-danger {
-    width: 100%;
-    padding: 12px;
-    background: rgba(163, 51, 51, 0.1);
-    color: #a33;
-    border: 1px solid #a33;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.btn-danger:hover { background: #a33; color: white; }
-    </style>
+    /* 8. PROFILE & DANGER ZONE */
+    .scroll-list { max-height: 250px; overflow-y: auto; background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px; }
+    .btn-danger { background: rgba(163, 51, 51, 0.1); color: #a33; border: 1px solid #a33; border-radius: 8px; width: 100%; padding: 12px; cursor: pointer; }
+    .back-btn { background: none; border: none; color: #8b5e3c; font-weight: bold; cursor: pointer; }
+</style>
 </head>
 <body>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -334,7 +130,7 @@
     </p>
 </div>
 
-    </div> </div> <div id="mainApp" class="glass-panel" style="display: none;">
+     <div id="mainApp" class="glass-panel" style="display: none;">
     </div>
 
 <div id="profilePage" class="glass-panel" style="display: none;">
@@ -382,9 +178,10 @@
         <h2 class="fade-in-text">SESSION COMPLETE</h2>
         <div class="divider-grow"></div>
         <p class="take-break">Time for a coffee break?</p>
-        <button class="btn-continue" onclick="closeModal()">Close</button>
+        <button class="btn-continue"onclick="closeModal()">Close</button>
     </div>
 </div>
+
 <script>
     const API_URL = "https://pomo-backend-slsl.onrender.com";
     
