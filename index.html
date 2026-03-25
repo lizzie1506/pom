@@ -384,307 +384,172 @@
     // --- GLOBAL STATE ---
     let isLogin = true; 
     let timerId;
-    let timeLeft = 25 * 60; // Standard 25 minutes
+    let timeLeft = 25 * 60; 
 
     // --- VIEW NAVIGATION ---
+    function navigateTo(pageId) {
+        const pages = ['authContainer', 'mainApp', 'profilePage'];
+        pages.forEach(id => {
+            const el = document.getElementById(id);
+            if (id === pageId) {
+                el.style.display = (id === 'profilePage' || id === 'mainApp') ? 'block' : 'flex';
+            } else {
+                el.style.display = 'none';
+            }
+        });
+    }
+
     function toggleAuthMode() {
         isLogin = !isLogin;
-        
         const extra = document.getElementById('extraFields');
-        const authTitle = document.getElementById('authTitle');
-        const authBtn = document.getElementById('authBtn');
-        const toggleLink = document.getElementById('toggleLink');
-        const switchText = document.getElementById('switchText');
         const forgotLink = document.getElementById('forgotPassLink');
-
-        if (isLogin) {
-            authTitle.innerText = "Focus Time";
-            authBtn.innerText = "Log In";
-            switchText.innerText = "New here?";
-            toggleLink.innerText = "Create Account";
-            extra.style.display = 'none';
-            if(forgotLink) forgotLink.style.display = 'block';
-        } else {
-            authTitle.innerText = "Join Us";
-            authBtn.innerText = "Sign Up";
-            switchText.innerText = "Already have an account?";
-            toggleLink.innerText = "Login instead";
-            extra.style.display = 'block';
-            if(forgotLink) forgotLink.style.display = 'none';
-        }
+        
+        extra.style.display = isLogin ? 'none' : 'block';
+        forgotLink.style.display = isLogin ? 'block' : 'none';
+        
+        document.getElementById('authTitle').innerText = isLogin ? "Focus Time" : "Join Us";
+        document.getElementById('authBtn').innerText = isLogin ? "Log In" : "Sign Up";
+        document.getElementById('toggleLink').innerText = isLogin ? "Create Account" : "Login instead";
     }
 
     // --- AUTHENTICATION ---
     async function handleAuth() {
-            const user = document.getElementById('userInput').value;
-            const pass = document.getElementById('passInput').value;
-            const route = isLogin ? "/login" : "/register";
+        const user = document.getElementById('userInput').value;
+        const pass = document.getElementById('passInput').value;
+        const route = isLogin ? "/login" : "/register";
 
-            const res = await fetch(`${API_URL}${route}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: user, password: pass })
-            });
-
-            const data = await res.json();
-            if (res.ok) {
-                if(isLogin) {
-                    localStorage.setItem('pomoToken', data.token);
-                    showApp();
-                } else {
-                    alert("Account created! Now login.");
-                    toggleAuthMode();
-                }
-            } else { alert(data.error); }
+        // Collect extra fields if signing up
+        let bodyData = { username: user, password: pass };
+        if (!isLogin) {
+            bodyData.email = document.getElementById('emailInput').value;
+            bodyData.phone = document.getElementById('phoneInput').value;
+            bodyData.dob = document.getElementById('dobInput').value;
         }
 
-        // --- NAVIGATION ---
-        function showApp() {
-    document.getElementById('authContainer').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    document.getElementById('profilePage').style.display = 'none'; // Ensure profile is hidden
-    loadHistory(); 
-}
-
-function showProfile() {
-    async function showProfile() {
-    const token = localStorage.getItem('pomoToken');
-    
-    // 1. Fetch user info from a new /me endpoint (you'll need to create this)
-    const res = await fetch(`${API_URL}/me`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const userData = await res.json();
-
-    // 2. Fill the placeholders
-    document.getElementById('profUser').innerText = userData.username;
-    document.getElementById('profEmail').innerText = userData.email || "Not provided";
-    document.getElementById('profPhone').innerText = userData.phone || "Not provided";
-    document.getElementById('profDOB').innerText = new Date(userData.dob).toLocaleDateString();
-
-    // 3. Show the page
-    document.getElementById('mainApp').style.display = 'none';
-    document.getElementById('profilePage').style.display = 'block';
-    loadHistory(); 
-}
-}
-
-function showTimer() {
-    document.getElementById('profilePage').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-}
-
-        function logout() {
-    localStorage.removeItem('pomoToken');
-    document.getElementById('mainApp').style.display = 'none';
-    document.getElementById('profilePage').style.display = 'none';
-    document.getElementById('authContainer').style.display = 'flex';
-    location.reload(); // Hard reset to clear any remaining timer states
-}
-
-        // --- TIMER LOGIC ---
-        function startTimer() {
-            if (timerId) return;
-            const btn = document.getElementById('startBtn');
-            btn.innerText = "Focusing...";
-            
-            timerId = setInterval(() => {
-                timeLeft--;
-                updateDisplay();
-                if (timeLeft <= 0) {
-                    clearInterval(timerId);
-                    timerId = null;
-                    saveSession();
-                    // Replace the alert line with this:
-document.getElementById('celebrationModal').style.display = 'flex';
-                }
-            }, 1000);
-        }
-
-        function resetTimer() {
-            clearInterval(timerId);
-            timerId = null;
-            timeLeft = 1 * 60; // Reset to 1 minute for testing for now 
-            updateDisplay();
-            document.getElementById('startBtn').innerText = "Start Focus";
-        }
-
-        function updateDisplay() {
-            const mins = Math.floor(timeLeft / 60);
-            const secs = timeLeft % 60;
-            document.getElementById('timerDisplay').innerText = 
-                `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-        }
-
-        // --- DATABASE SYNC ---
-        async function saveSession() {
-            const task = document.getElementById('taskInput').value || "Deep Work";
-            const token = localStorage.getItem('pomoToken');
-
-            await fetch(`${API_URL}/start-task`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` 
-                },
-                body: JSON.stringify({ taskName: task })
-            });
-            loadHistory();
-        }
-
-        async function loadHistory() {
-    const token = localStorage.getItem('pomoToken');
-    const res = await fetch(`${API_URL}/my-tasks`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const data = await res.json();
-    
-    // ONLY update the list div, not the whole section
-    const list = document.getElementById('profileHistoryList'); // New ID on profile page
-    
-    if (data.length === 0) {
-        list.innerHTML = "<p style='font-size:0.8rem; color:#999;'>No sessions yet.</p>";
-    } else {
-        list.innerHTML = data.map(t => `
-            <div class="history-item">
-                <span>${t.task_name}</span>
-                <span style="color:#8b5e3c">${new Date(t.created_at).toLocaleDateString()}</span>
-            </div>
-        `).join('');
-    }
-}
-        async function clearHistory() {
-    if (!confirm("Are you sure you want to wipe your entire focus history?")) return;
-
-    const token = localStorage.getItem('pomoToken');
-    const res = await fetch(`${API_URL}/clear-history`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (res.ok) {
-        loadHistory(); // Refresh the list (it will now be empty)
-        alert("History cleared.");
-    }
-}
-
-async function deleteAccount() {
-    if (!confirm("WARNING: This will permanently delete your account and all data. Proceed?")) return;
-
-    const token = localStorage.getItem('pomoToken');
-    const res = await fetch(`${API_URL}/delete-account`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (res.ok) {
-        alert("Account deleted. Redirecting...");
-        logout(); // This clears the token and reloads to the login page
-    }
-}
-// In your timer logic, when time is up:
-function sessionFinished() {
-    document.getElementById('celebrationModal').style.display = 'flex';
-}
-function closeModal() {
-    document.getElementById('celebrationModal').style.display = 'none';
-    resetTimer(); // Optional: Resets the timer for the next round
-}
-function toggleAuthMode() {
-    isLogin = !isLogin;
-    const extra = document.getElementById('extraFields');
-    const forgotLink = document.getElementById('forgotPassLink');
-    
-    extra.style.display = isLogin ? 'none' : 'block';
-    forgotLink.style.display = isLogin ? 'block' : 'none'; // Hide forgot pass during signup
-    
-    document.getElementById('authTitle').innerText = isLogin ? "Focus Time" : "Join Us";
-    document.getElementById('authBtn').innerText = isLogin ? "Log In" : "Sign Up";
-    document.getElementById('toggleLink').innerText = isLogin ? "Create Account" : "Login instead";
-}
-async function handleForgotPassword() {
-    const username = prompt("Enter Username:");
-    const email = prompt("Enter Registered Email:");
-    const dob = prompt("Enter DOB (YYYY-MM-DD):");
-
-    if(!username || !email || !dob) return;
-
-    // 1. Verify
-    const res = await fetch(`${API_URL}/reset-password-verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, dob })
-    });
-
-    if (res.ok) {
-        // 2. If verified, ask for new password
-        const newPassword = prompt("Verified! Enter new password:");
-        if(!newPassword) return;
-
-        const updateRes = await fetch(`${API_URL}/update-password-final`, {
-            method: 'PUT',
+        const res = await fetch(`${API_URL}${route}`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, newPassword })
+            body: JSON.stringify(bodyData)
         });
 
-        if (updateRes.ok) alert("Password changed! You can now log in.");
-    } else {
-        alert("Verification failed. Incorrect details.");
+        const data = await res.json();
+        if (res.ok) {
+            if(isLogin) {
+                localStorage.setItem('pomoToken', data.token);
+                navigateTo('mainApp');
+                loadHistory();
+            } else {
+                alert("Account created! Now login.");
+                toggleAuthMode();
+            }
+        } else { alert(data.error); }
     }
-}
-// HELPER: Hide all pages and show only one
-function navigateTo(pageId) {
-    const pages = ['authContainer', 'mainApp', 'profilePage'];
-    pages.forEach(id => {
-        document.getElementById(id).style.display = (id === pageId) ? 'flex' : 'none';
-        if (id === 'profilePage' && pageId === 'profilePage') {
-            document.getElementById(id).style.display = 'block'; // Profile uses block, others use flex
+
+    // --- PROFILE & HISTORY ---
+    async function showProfile() {
+        const token = localStorage.getItem('pomoToken');
+        if (!token) return logout();
+
+        try {
+            const res = await fetch(`${API_URL}/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const userData = await res.json();
+
+            document.getElementById('profUser').innerText = userData.username;
+            document.getElementById('profEmail').innerText = userData.email || "N/A";
+            document.getElementById('profPhone').innerText = userData.phone || "N/A";
+            document.getElementById('profDOB').innerText = userData.dob ? new Date(userData.dob).toLocaleDateString() : "N/A";
+
+            navigateTo('profilePage');
+            loadHistory();
+        } catch (err) {
+            console.error("Profile load failed", err);
         }
-    });
-}
+    }
 
-// Update your existing showProfile to use navigation
-async function showProfile() {
-    const token = localStorage.getItem('pomoToken');
-    if (!token) return logout();
+    function showTimer() { navigateTo('mainApp'); }
 
-    try {
-        const res = await fetch(`${API_URL}/me`, {
+    async function loadHistory() {
+        const token = localStorage.getItem('pomoToken');
+        if (!token) return;
+        const res = await fetch(`${API_URL}/my-tasks`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const userData = await res.json();
-
-        // Update UI placeholders
-        document.getElementById('profUser').innerText = userData.username;
-        document.getElementById('profEmail').innerText = userData.email || "N/A";
-        document.getElementById('profPhone').innerText = userData.phone || "N/A";
-        document.getElementById('profDOB').innerText = userData.dob ? new Date(userData.dob).toLocaleDateString() : "N/A";
-
-        navigateTo('profilePage');
-        loadHistory();
-    } catch (err) {
-        console.error("Profile load failed", err);
+        const data = await res.json();
+        const list = document.getElementById('profileHistoryList');
+        
+        if (!data || data.length === 0) {
+            list.innerHTML = "<p style='font-size:0.8rem; color:#999;'>No sessions yet.</p>";
+        } else {
+            list.innerHTML = data.map(t => `
+                <div class="history-item">
+                    <span>${t.task_name}</span>
+                    <span style="color:#8b5e3c">${new Date(t.created_at).toLocaleDateString()}</span>
+                </div>
+            `).join('');
+        }
     }
-}
-    const data = await res.json();
-    if (res.ok) {
-        const newPass = prompt("Identity Verified! Enter your NEW password:");
-        // Call a second endpoint to actually save the new password
-        await fetch(`${API_URL}/update-password`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, newPass })
+
+    // --- TIMER LOGIC ---
+    function startTimer() {
+        if (timerId) return;
+        document.getElementById('startBtn').innerText = "Focusing...";
+        timerId = setInterval(() => {
+            timeLeft--;
+            updateDisplay();
+            if (timeLeft <= 0) {
+                clearInterval(timerId);
+                timerId = null;
+                saveSession();
+                document.getElementById('celebrationModal').style.display = 'flex';
+            }
+        }, 1000);
+    }
+
+    function resetTimer() {
+        clearInterval(timerId);
+        timerId = null;
+        timeLeft = 25 * 60; 
+        updateDisplay();
+        document.getElementById('startBtn').innerText = "Start Focus";
+    }
+
+    function updateDisplay() {
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        document.getElementById('timerDisplay').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    async function saveSession() {
+        const task = document.getElementById('taskInput').value || "Deep Work";
+        const token = localStorage.getItem('pomoToken');
+        await fetch(`${API_URL}/start-task`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ taskName: task })
         });
-        alert("Password updated successfully!");
-    } else {
-        alert("Verification failed. Details do not match.");
+        loadHistory();
     }
 
+    function closeModal() {
+        document.getElementById('celebrationModal').style.display = 'none';
+        resetTimer();
+    }
 
-        // --- AUTO-LOGIN ON LOAD ---
-        window.onload = () => {
-            if (localStorage.getItem('pomoToken')) showApp();
-        };
+    function logout() {
+        localStorage.removeItem('pomoToken');
+        location.reload();
+    }
+
+    window.onload = () => {
+        if (localStorage.getItem('pomoToken')) {
+            navigateTo('mainApp');
+            loadHistory();
+        } else {
+            navigateTo('authContainer');
+        }
+    };
     </script>
 </body>
 </html>
