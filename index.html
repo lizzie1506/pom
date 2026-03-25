@@ -342,6 +342,32 @@
         localStorage.removeItem('pomoToken');
         location.reload();
     }
+    
+    // This MUST be inside your <script> tags
+async function handleForgotPassword() {
+    const username = document.getElementById('userInput').value;
+
+    if (!username) {
+        alert("Please enter your username in the login box first!");
+        return;
+    }
+
+    try {
+        // This talks to your Node.js server you just set up
+        const response = await fetch(`${API_URL}/api/forgot-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+        });
+
+        const data = await response.json();
+        alert(data.message);
+        
+    } catch (error) {
+        console.error("Connection Error:", error);
+        alert("Could not connect to the server. Is your backend running?");
+    }
+}
 
     window.onload = () => {
         if (localStorage.getItem('pomoToken')) {
