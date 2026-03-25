@@ -386,13 +386,36 @@
         let timeLeft = 1*60;
 
         // --- AUTH LOGIC ---
-        function toggleAuthMode() {
-            isLogin = !isLogin;
-            document.getElementById('authTitle').innerText = isLogin ? "Focus Time" : "Join Us";
-            document.getElementById('authBtn').innerText = isLogin ? "Log In" : "Sign Up";
-            document.getElementById('toggleLink').innerText = isLogin ? "Create an account" : "Login instead";
-        }
+        let isLogin = true; // This tracks if we are on Login or Sign Up mode
 
+function toggleAuthMode() {
+    isLogin = !isLogin; // Flips true to false, or false to true
+    
+    const extra = document.getElementById('extraFields');
+    const authTitle = document.getElementById('authTitle');
+    const authBtn = document.getElementById('authBtn');
+    const toggleLink = document.getElementById('toggleLink');
+    const switchText = document.getElementById('switchText');
+    const forgotLink = document.getElementById('forgotPassLink');
+
+    if (isLogin) {
+        // --- SWITCH TO LOGIN VIEW ---
+        authTitle.innerText = "Focus Time";
+        authBtn.innerText = "Log In";
+        switchText.innerText = "New here?";
+        toggleLink.innerText = "Create Account";
+        extra.style.display = 'none'; // Hide Email, Phone, DOB
+        if(forgotLink) forgotLink.style.display = 'block'; 
+    } else {
+        // --- SWITCH TO SIGN UP VIEW ---
+        authTitle.innerText = "Join Us";
+        authBtn.innerText = "Sign Up";
+        switchText.innerText = "Already have an account?";
+        toggleLink.innerText = "Login instead";
+        extra.style.display = 'block'; // Show Email, Phone, DOB
+        if(forgotLink) forgotLink.style.display = 'none';
+    }
+}
         async function handleAuth() {
             const user = document.getElementById('userInput').value;
             const pass = document.getElementById('passInput').value;
