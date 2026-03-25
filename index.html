@@ -375,7 +375,7 @@
         <h2 class="fade-in-text">SESSION COMPLETE</h2>
         <div class="divider-grow"></div>
         <p class="take-break">Time for a coffee break?</p>
-        <button class="btn-continue" onclick="closeModal()">CONTINUE</button>
+        <button class="btn-continue" onclick="closeModal()">Close</button>
     </div>
 </div>
 <script>
@@ -489,16 +489,14 @@
 
         const data = await res.json();
         const list = document.getElementById('profileHistoryList');
+        if (!list) return;// Stop the function if the element isn't there!
         if (list) {
             list.innerHTML = data.map(t => `
                 <div class="history-item">
                     <span>${t.task_name}</span>
                     <span>${new Date(t.created_at).toLocaleDateString()}</span>
                 </div>
-            `).join('');
-            const list = document.getElementById('profileHistoryList');
-if (!list) return; // Stop the function if the element isn't there!
-        }
+            `).join('');}
     } catch (err) {
         console.error("History Error:", err);
     }
