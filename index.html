@@ -253,6 +253,45 @@
         width: 95%; /* Make the timer box fill the phone screen */
     }
 }
+.back-btn {
+    background: none;
+    border: none;
+    color: #8b5e3c;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.scroll-list {
+    max-height: 250px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: #8b5e3c;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.btn-danger {
+    width: 100%;
+    padding: 12px;
+    background: rgba(163, 51, 51, 0.1);
+    color: #a33;
+    border: 1px solid #a33;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-danger:hover { background: #a33; color: white; }
     </style>
 </head>
 <body>
@@ -287,16 +326,27 @@
         <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
         <button class="btn btn-outline" onclick="logout()" style="margin-top: 20px; color: #8b5e3c; border-color: #8b5e3c;">Logout</button>
 
-        <div id="historySection">
-            <h4 style="margin-bottom: 10px;">Your History</h4>
-            <div id="historyList">
-                </div>
-                <div style="margin-top: 20px; border-top: 1px solid rgba(74, 63, 53, 0.1); padding-top: 15px;">
-        <button onclick="deleteAccount()" class="danger-link">
-            Delete Account Permanently
-        </button>
+        <button class="btn-outline" onclick="showProfile()" style="margin-top: 20px;">View Profile & History</button>
     </div>
         </div>
+        <div id="profilePage" class="glass-panel" style="width: 500px; padding: 40px; display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <button onclick="showTimer()" class="back-btn">← Back to Timer</button>
+        <h2 style="margin: 0;">Your Profile</h2>
+    </div>
+
+    <div class="profile-stats">
+        <p class="subtitle">Focus History</p>
+        <div id="profileHistoryList" class="scroll-list">
+            </div>
+        <button onclick="clearHistory()" class="btn-text">Clear All History</button>
+    </div>
+
+    <div style="margin-top: 40px; border-top: 1px solid rgba(74, 63, 53, 0.1); padding-top: 20px;">
+        <p class="subtitle" style="color: #a33;">Danger Zone</p>
+        <button class="btn-danger" onclick="deleteAccount()">Delete Account Permanently</button>
+    </div>
+</div>
     </div>
 <div id="celebrationModal" class="celebration-overlay">
     <div class="celebration-content">
@@ -348,15 +398,30 @@
 
         // --- NAVIGATION ---
         function showApp() {
-            document.getElementById('authContainer').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            loadHistory();
-        }
+    document.getElementById('authContainer').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    document.getElementById('profilePage').style.display = 'none'; // Ensure profile is hidden
+    loadHistory(); 
+}
+
+function showProfile() {
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('profilePage').style.display = 'block';
+    loadHistory(); 
+}
+
+function showTimer() {
+    document.getElementById('profilePage').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+}
 
         function logout() {
-            localStorage.clear();
-            location.reload();
-        }
+    localStorage.removeItem('pomoToken');
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('profilePage').style.display = 'none';
+    document.getElementById('authContainer').style.display = 'flex';
+    location.reload(); // Hard reset to clear any remaining timer states
+}
 
         // --- TIMER LOGIC ---
         function startTimer() {
@@ -416,7 +481,7 @@ document.getElementById('celebrationModal').style.display = 'flex';
     const data = await res.json();
     
     // ONLY update the list div, not the whole section
-    const list = document.getElementById('historyList');
+    const list = document.getElementById('profileHistoryList'); // New ID on profile page
     
     if (data.length === 0) {
         list.innerHTML = "<p style='font-size:0.8rem; color:#999;'>No sessions yet.</p>";
