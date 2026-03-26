@@ -568,7 +568,9 @@
         // --- TIMER LOGIC ---
         function startTimer() {
             if (timerId) return;
-            document.getElementById('startBtn').innerText = "Focusing...";
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            
             timerId = setInterval(() => {
                 timeLeft--;
                 updateDisplay();
@@ -608,10 +610,11 @@
                 closeExitModal();
 
                 // Notify Backend that the session was cancelled
+                const username = document.getElementById('profUser').innerText || "Unknown";
                 await fetch(`${API_URL}/api/timer-event`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: 'cancelled', username: currentUser })
+                    body: JSON.stringify({ status: 'cancelled', username: username })
                 });
             } else {
                 alert("Wrong answer! Stay focused!");
@@ -619,10 +622,12 @@
         }
 
         function stopTimerLogic() {
-            clearInterval(timerInterval); // Stop the counting
+            clearInterval(timerId); // Stop the counting
+            timerId = null;
             window.onbeforeunload = null; // Remove browser lock
             document.getElementById('stopBtn').style.display = 'none';
             document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('startBtn').innerText = "Resume Focus";
         }
 
         function resetTimer() {
@@ -630,6 +635,8 @@
             timerId = null;
             timeLeft = 25 * 60;
             updateDisplay();
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'inline-block';
             document.getElementById('startBtn').innerText = "Start Focus";
         }
 
