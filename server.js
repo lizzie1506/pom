@@ -185,6 +185,32 @@ app.post('/api/timer-history', async (req, res) => {
         res.status(500).json({ message: "Failed to save history." });
     }
 });
+app.get('/api/profile/:username', async (req, res) => {
+    const { username } = req.params;
+    try {
+        // 1. Get User Info
+        const userRes = await pool.query(
+            'SELECT username, email, contact FROM users WHERE username = $1', 
+            [username]
+        );
+
+        // 2. Get Session Stats (Count how many 'started' vs 'completed')
+        const statsRes = await pool.query(
+            'SELECT status, COUNT(*) as count FROM timer_history WHERE username = $1 GROUP BY status',
+            [username]
+        );
+
+        if (userRes.rows.length === 0) return res.status(404).send("User not found");
+
+        res.json({
+            profile: userRes.rows[0],
+            stats: statsRes.rows
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+});
 
 app.post('/api/timer-event', async (req, res) => {
     const { status, username } = req.body;
