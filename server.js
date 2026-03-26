@@ -339,10 +339,16 @@ const nodemailer = require('nodemailer');
 
 // Create the email transporter
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465, // Use 465 for Secure connection
+    secure: true, // true for 465, false for other ports
     auth: {
-        user: 'pomofocusweb@gmail.com',
-        pass: 'ksld bkxw pstb lewe' // 16-character code from Google
+        user: 'your-email@gmail.com',
+        pass: 'your-16-digit-app-password' // No spaces
+    },
+    tls: {
+        // This helps if Render is having trouble verifying the SSL certificate
+        rejectUnauthorized: false 
     }
 });
 // Export for Vercel
