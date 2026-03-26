@@ -1,480 +1,700 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pomo Focus | Workspace Edition</title>
     <style>
-    /* 1. RESET & FOUNDATION */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-    
-    body {
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: url('https://img.freepik.com/premium-photo/uncluttered-office-setup-aesthetic-top-view-desk-with-computer-laptop-office-equipment-spac_1000124-67783.jpg') no-repeat center center/cover;
-        color: #3d2b1f;
-        overflow: hidden;
-    }
+        /* 1. RESET & FOUNDATION */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
 
-    /* 2. THE GLASS PANEL SYSTEM (The "Lag" Killer) */
-    .glass-panel {
-        background: rgba(255, 255, 255, 0.4);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        display: none; /* JS toggles this to 'flex' or 'block' */
-        transition: opacity 0.4s ease, transform 0.4s ease;
-    }
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('https://img.freepik.com/premium-photo/uncluttered-office-setup-aesthetic-top-view-desk-with-computer-laptop-office-equipment-spac_1000124-67783.jpg') no-repeat center center/cover;
+            color: #3d2b1f;
+            overflow: hidden;
+        }
 
-    /* VIEW SIZES */
-    #authContainer { width: 900px; height: 550px; display: flex; flex-direction: row; }
-    #mainApp { width: 450px; padding: 40px; text-align: center; }
-    #profilePage { width: 500px; padding: 40px; }
+        /* 2. THE GLASS PANEL SYSTEM (The "Lag" Killer) */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            display: none;
+            /* JS toggles this to 'flex' or 'block' */
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
 
-    /* 3. BRANDING & AUTH STYLES */
-    .auth-left { flex: 1.2; display: flex; align-items: center; justify-content: center; padding: 40px; }
-    .brand-content { text-align: center; animation: fadeIn 1.2s ease-out; }
-    .brand-content h1 { font-size: 3.5rem; letter-spacing: 8px; font-weight: 800; text-shadow: 2px 2px 4px rgba(255,255,255,0.5); }
-    .divider { width: 60px; height: 3px; background: #8b5e3c; margin: 15px auto; border-radius: 2px; }
-    .tagline { font-family: 'Georgia', serif; font-style: italic; font-size: 1.1rem; opacity: 0.9; line-height: 1.6; }
+        /* VIEW SIZES */
+        #authContainer {
+            width: 900px;
+            height: 550px;
+            display: flex;
+            flex-direction: row;
+        }
 
-    .auth-right { flex: 1; padding: 50px; display: flex; flex-direction: column; justify-content: center; background: rgba(255, 255, 255, 0.2); }
+        #mainApp {
+            width: 450px;
+            padding: 40px;
+            text-align: center;
+        }
 
-    /* 4. TIMER & INTERFACE */
-    #timerDisplay { font-size: 5rem; font-weight: bold; margin: 20px 0; color: #3d2b1f; }
-    
-    input {
-        width: 100%; padding: 12px; margin-bottom: 15px;
-        background: rgba(255,255,255,0.5); border: 1px solid rgba(74, 63, 53, 0.2);
-        border-radius: 8px; outline: none;
-    }
+        #profilePage {
+            width: 500px;
+            padding: 40px;
+        }
 
-    .btn { width: 100%; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; border: none; }
-    .btn-primary { background: #3d2b1f; color: white; }
-    .btn-primary:hover { background: #5d4a3a; transform: translateY(-2px); }
-    .btn-outline { background: transparent; border: 1px solid #3d2b1f; color: #3d2b1f; }
+        /* 3. BRANDING & AUTH STYLES */
+        .auth-left {
+            flex: 1.2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
 
-    /* The background overlay */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 2000;
-    backdrop-filter: blur(5px); /* Makes it look modern */
-}
+        .brand-content {
+            text-align: center;
+            animation: fadeIn 1.2s ease-out;
+        }
 
-/* The box in the middle */
-.modal-content {
-    background: #fff;
-    width: 300px;
-    margin: 15% auto;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    color: #333;
-}
+        .brand-content h1 {
+            font-size: 3.5rem;
+            letter-spacing: 8px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+        }
 
-#stopBtn {
-    background-color: #e74c3c; /* Red for stopping */
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-}
+        .divider {
+            width: 60px;
+            height: 3px;
+            background: #8b5e3c;
+            margin: 15px auto;
+            border-radius: 2px;
+        }
 
-.modal-buttons button {
-    margin: 10px;
-    padding: 8px 15px;
-    border-radius: 4px;
-    border: none;
-}
+        .tagline {
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
 
-.confirm-btn { background: #e74c3c; color: white; }
-.cancel-btn { background: #2ecc71; color: white; }
+        .auth-right {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+        }
 
-    /* 5. CELEBRATION MODAL (The "Ghost" Fix) */
-    .celebration-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-        display: none; justify-content: center; align-items: center;
-        z-index: 9999; pointer-events: none; /* Stops the ghost button lag */
-    }
-    
-    /* Reveal button safely only when active */
-    .celebration-overlay[style*="flex"] { pointer-events: auto; }
+        /* 4. TIMER & INTERFACE */
+        #timerDisplay {
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #3d2b1f;
+        }
 
-    .celebration-content { text-align: center; color: #3d2b1f; animation: superPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49); }
-    .emoji-bounce { font-size: 4rem; animation: float 2s infinite ease-in-out; }
-    .bounce-text { font-size: 4rem; letter-spacing: 10px; font-weight: 900; }
-    .divider-grow { width: 0; height: 3px; background: #8b5e3c; margin: 15px auto; animation: growLine 0.8s forwards 0.6s; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(74, 63, 53, 0.2);
+            border-radius: 8px;
+            outline: none;
+        }
 
-    /* 6. ALL KEYFRAME ANIMATIONS */
-    @keyframes fadeIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-    @keyframes growLine { to { width: 80px; } }
-    @keyframes superPop { 0% { transform: scale(0); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            border: none;
+        }
 
-    /* 7. RESPONSIVE DESIGN */
-    @media (max-width: 768px) {
-        #authContainer { flex-direction: column; width: 90%; height: auto; }
-        .auth-left, .auth-right { flex: none; width: 100%; padding: 30px; }
-        .brand-content h1 { font-size: 2.2rem; }
-        #mainApp, #profilePage { width: 95%; margin: 10px; }
-    }
+        .btn-primary {
+            background: #3d2b1f;
+            color: white;
+        }
 
-    /* 8. PROFILE & DANGER ZONE */
-    .scroll-list { max-height: 250px; overflow-y: auto; background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px; }
-    .btn-danger { background: rgba(163, 51, 51, 0.1); color: #a33; border: 1px solid #a33; border-radius: 8px; width: 100%; padding: 12px; cursor: pointer; }
-    .back-btn { background: none; border: none; color: #8b5e3c; font-weight: bold; cursor: pointer; }
-</style>
+        .btn-primary:hover {
+            background: #5d4a3a;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #3d2b1f;
+            color: #3d2b1f;
+        }
+
+        /* The background overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+            /* Makes it look modern */
+        }
+
+        /* The box in the middle */
+        .modal-content {
+            background: #fff;
+            width: 300px;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            color: #333;
+        }
+
+        #stopBtn {
+            background-color: #e74c3c;
+            /* Red for stopping */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-buttons button {
+            margin: 10px;
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: none;
+        }
+
+        .confirm-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #2ecc71;
+            color: white;
+        }
+
+        /* 5. CELEBRATION MODAL (The "Ghost" Fix) */
+        .celebration-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            pointer-events: none;
+            /* Stops the ghost button lag */
+        }
+
+        /* Reveal button safely only when active */
+        .celebration-overlay[style*="flex"] {
+            pointer-events: auto;
+        }
+
+        .celebration-content {
+            text-align: center;
+            color: #3d2b1f;
+            animation: superPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+        }
+
+        .emoji-bounce {
+            font-size: 4rem;
+            animation: float 2s infinite ease-in-out;
+        }
+
+        .bounce-text {
+            font-size: 4rem;
+            letter-spacing: 10px;
+            font-weight: 900;
+        }
+
+        .divider-grow {
+            width: 0;
+            height: 3px;
+            background: #8b5e3c;
+            margin: 15px auto;
+            animation: growLine 0.8s forwards 0.6s;
+        }
+
+        /* 6. ALL KEYFRAME ANIMATIONS */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes growLine {
+            to {
+                width: 80px;
+            }
+        }
+
+        @keyframes superPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            70% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* 7. RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            #authContainer {
+                flex-direction: column;
+                width: 90%;
+                height: auto;
+            }
+
+            .auth-left,
+            .auth-right {
+                flex: none;
+                width: 100%;
+                padding: 30px;
+            }
+
+            .brand-content h1 {
+                font-size: 2.2rem;
+            }
+
+            #mainApp,
+            #profilePage {
+                width: 95%;
+                margin: 10px;
+            }
+        }
+
+        /* 8. PROFILE & DANGER ZONE */
+        .scroll-list {
+            max-height: 250px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .btn-danger {
+            background: rgba(163, 51, 51, 0.1);
+            color: #a33;
+            border: 1px solid #a33;
+            border-radius: 8px;
+            width: 100%;
+            padding: 12px;
+            cursor: pointer;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #8b5e3c;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
-    
+
     <div id="authContainer" class="glass-panel" style="display: flex;">
-    <div class="auth-left">
-        <div class="brand-content">
-            <h1>POMOFOCUS</h1>
-            <div class="divider"></div>
-            <p class="tagline">"Success is the sum of small focus sessions, repeated day in and day out."</p>
+        <div class="auth-left">
+            <div class="brand-content">
+                <h1>POMOFOCUS</h1>
+                <div class="divider"></div>
+                <p class="tagline">"Success is the sum of small focus sessions, repeated day in and day out."</p>
+            </div>
+        </div>
+        <div class="auth-right">
+            <h2 id="authTitle">Focus Time</h2>
+            <p class="subtitle" id="authSub">Sign in to start your session.</p>
+            <input type="text" id="userInput" placeholder="Username">
+            <div id="extraFields" style="display: none;">
+                <input type="email" id="emailInput" placeholder="Email Address">
+                <input type="tel" id="phoneInput" placeholder="Phone Number">
+                <input type="date" id="dobInput" title="Date of Birth">
+            </div>
+            <input type="password" id="passInput" placeholder="Password">
+            <button class="btn btn-primary" onclick="handleAuth()" id="authBtn">Log In</button>
+            <p id="forgotPassLink" style="margin-top:10px; font-size:0.8rem; text-align:center;">
+                <a href="#" onclick="handleForgotPassword()" style="color:#8b5e3c; text-decoration:none;">Forgot
+                    Password?</a>
+            </p>
+            <p style="margin-top:15px; font-size:0.8rem; text-align:center;">
+                <span id="switchText">New here?</span>
+                <a href="#" onclick="toggleAuthMode()" id="toggleLink"
+                    style="color:#8b5e3c; text-decoration:none; font-weight:bold;">Create Account</a>
+            </p>
         </div>
     </div>
-    <div class="auth-right">
-        <h2 id="authTitle">Focus Time</h2>
-        <p class="subtitle" id="authSub">Sign in to start your session.</p>
-        <input type="text" id="userInput" placeholder="Username">
-        <div id="extraFields" style="display: none;">
-            <input type="email" id="emailInput" placeholder="Email Address">
-            <input type="tel" id="phoneInput" placeholder="Phone Number">
-            <input type="date" id="dobInput" title="Date of Birth">
+
+    <div id="mainApp" class="glass-panel" style="display: none;">
+        <h2>Pomo Focus</h2>
+        <input type="text" id="taskInput" placeholder="What are you working on?">
+        <div id="timerDisplay">01:00</div>
+        <button class="btn btn-primary" onclick="startTimer()" id="startBtn">Start Focus</button>
+        <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
+        <button id="stopBtn" onclick="requestExit()" style="display:none;">Break Focus</button>
+        <button class="btn-outline" onclick="showProfile()" style="margin-top: 20px;">View Profile & History</button>
+        <button class="btn btn-outline" onclick="logout()"
+            style="margin-top: 10px; color: #8b5e3c; border-color: #8b5e3c;">Logout</button>
+    </div>
+
+    <div id="profilePage" class="glass-panel" style="display: none; width: 500px; padding: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <button onclick="showTimer()" class="back-btn">← Back to Timer</button>
+            <h2 style="margin: 0;">Your Profile</h2>
         </div>
-        <input type="password" id="passInput" placeholder="Password">
-        <button class="btn btn-primary" onclick="handleAuth()" id="authBtn">Log In</button>
-        <p id="forgotPassLink" style="margin-top:10px; font-size:0.8rem; text-align:center;">
-            <a href="#" onclick="handleForgotPassword()" style="color:#8b5e3c; text-decoration:none;">Forgot Password?</a>
-        </p>
-        <p style="margin-top:15px; font-size:0.8rem; text-align:center;">
-            <span id="switchText">New here?</span> 
-            <a href="#" onclick="toggleAuthMode()" id="toggleLink" style="color:#8b5e3c; text-decoration:none; font-weight:bold;">Create Account</a>
-        </p>
-    </div>
-</div>
+        <div class="user-details-card"
+            style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
+            <p><strong>Username:</strong> <span id="profUser">---</span></p>
+            <p><strong>Email:</strong> <span id="profEmail">---</span></p>
+            <p><strong>Phone:</strong> <span id="profPhone">---</span></p>
+            <p><strong>DOB:</strong> <span id="profDOB">---</span></p>
+        </div>
+        <div class="profile-stats">
+            <p class="subtitle">Focus History</p>
+            <div id="profileHistoryList" class="scroll-list"></div>
+            <button onclick="clearHistory()" class="btn-text">Clear All History</button>
+        </div>
 
-<div id="mainApp" class="glass-panel" style="display: none;">
-    <h2>Pomo Focus</h2>
-    <input type="text" id="taskInput" placeholder="What are you working on?">
-    <div id="timerDisplay">01:00</div>
-    <button class="btn btn-primary" onclick="startTimer()" id="startBtn">Start Focus</button>
-    <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
-    <button id="stopBtn" onclick="requestExit()" style="display:none;">Break Focus</button>
-    <button class="btn-outline" onclick="showProfile()" style="margin-top: 20px;">View Profile & History</button>
-    <button class="btn btn-outline" onclick="logout()" style="margin-top: 10px; color: #8b5e3c; border-color: #8b5e3c;">Logout</button>
-</div>
-
-<div id="profilePage" class="glass-panel" style="display: none; width: 500px; padding: 40px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <button onclick="showTimer()" class="back-btn">← Back to Timer</button>
-        <h2 style="margin: 0;">Your Profile</h2>
-    </div>
-    <div class="user-details-card" style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
-        <p><strong>Username:</strong> <span id="profUser">---</span></p>
-        <p><strong>Email:</strong> <span id="profEmail">---</span></p>
-        <p><strong>Phone:</strong> <span id="profPhone">---</span></p>
-        <p><strong>DOB:</strong> <span id="profDOB">---</span></p>
-    </div>
-    <div class="profile-stats">
-        <p class="subtitle">Focus History</p>
-        <div id="profileHistoryList" class="scroll-list"></div>
-        <button onclick="clearHistory()" class="btn-text">Clear All History</button>
-    </div>
-
-    <div style="margin-top: 40px; border-top: 1px solid rgba(74, 63, 53, 0.1); padding-top: 20px;">
-        <p class="subtitle" style="color: #a33;">Danger Zone</p>
-        <button class="btn-danger" onclick="deleteAccount()">Delete Account Permanently</button>
-    </div>
-</div>
-
-<div id="exitModal" class="modal-overlay">
-    <div class="modal-content">
-        <h3>STOP TIMER?</h3>
-        <p>To break your focus, solve this: <br> <span id="mathQuestion"></span></p>
-        <input type="number" id="exitVerificationInput" placeholder="Answer...">
-        <div class="modal-buttons">
-            <button class="confirm-btn" onclick="confirmExit()">Confirm Break</button>
-            <button class="cancel-btn" onclick="closeExitModal()">Back to Work</button>
+        <div style="margin-top: 40px; border-top: 1px solid rgba(74, 63, 53, 0.1); padding-top: 20px;">
+            <p class="subtitle" style="color: #a33;">Danger Zone</p>
+            <button class="btn-danger" onclick="deleteAccount()">Delete Account Permanently</button>
         </div>
     </div>
-</div>
 
-<div id="celebrationModal" class="celebration-overlay">
-    <div class="celebration-content">
-        <div class="emoji-bounce">🎉</div>
-        <h1 class="bounce-text">WELL DONE</h1>
-        <h2 class="fade-in-text">SESSION COMPLETE</h2>
-        <div class="divider-grow"></div>
-        <p class="take-break">Time for a coffee break?</p>
-        <button class="btn-continue" onclick="closeModal()">Close</button>
+    <div id="exitModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>STOP TIMER?</h3>
+            <p>To break your focus, solve this: <br> <span id="mathQuestion"></span></p>
+            <input type="number" id="exitVerificationInput" placeholder="Answer...">
+            <div class="modal-buttons">
+                <button class="confirm-btn" onclick="confirmExit()">Confirm Break</button>
+                <button class="cancel-btn" onclick="closeExitModal()">Back to Work</button>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    const API_URL = "https://pomo-backend-slsl.onrender.com";
-    
-    // --- GLOBAL STATE ---
-    let isLogin = true; 
-    let timerId;
-    let timeLeft = 25 * 60; 
+    <div id="celebrationModal" class="celebration-overlay">
+        <div class="celebration-content">
+            <div class="emoji-bounce">🎉</div>
+            <h1 class="bounce-text">WELL DONE</h1>
+            <h2 class="fade-in-text">SESSION COMPLETE</h2>
+            <div class="divider-grow"></div>
+            <p class="take-break">Time for a coffee break?</p>
+            <button class="btn-continue" onclick="closeModal()">Close</button>
+        </div>
+    </div>
 
-    // --- VIEW NAVIGATION ---
-    function navigateTo(pageId) {
-        const pages = ['authContainer', 'mainApp', 'profilePage'];
-        pages.forEach(id => {
-            const el = document.getElementById(id);
-            if (id === pageId) {
-                el.style.display = (id === 'profilePage' || id === 'mainApp') ? 'block' : 'flex';
-            } else {
-                el.style.display = 'none';
-            }
-        });
-    }
+    <script>
+        const API_URL = "https://pomo-backend-slsl.onrender.com";
 
-    function toggleAuthMode() {
-        isLogin = !isLogin;
-        const extra = document.getElementById('extraFields');
-        const forgotLink = document.getElementById('forgotPassLink');
-        
-        extra.style.display = isLogin ? 'none' : 'block';
-        forgotLink.style.display = isLogin ? 'block' : 'none';
-        
-        document.getElementById('authTitle').innerText = isLogin ? "Focus Time" : "Join Us";
-        document.getElementById('authBtn').innerText = isLogin ? "Log In" : "Sign Up";
-        document.getElementById('toggleLink').innerText = isLogin ? "Create Account" : "Login instead";
-    }
+        // --- GLOBAL STATE ---
+        let isLogin = true;
+        let timerId;
+        let timeLeft = 25 * 60;
 
-    // --- AUTHENTICATION ---
-    async function handleAuth() {
-        const user = document.getElementById('userInput').value;
-        const pass = document.getElementById('passInput').value;
-        const route = isLogin ? "/login" : "/register";
-
-        // Collect extra fields if signing up
-        let bodyData = { username: user, password: pass };
-        if (!isLogin) {
-            bodyData.email = document.getElementById('emailInput').value;
-            bodyData.phone = document.getElementById('phoneInput').value;
-            bodyData.dob = document.getElementById('dobInput').value;
-        }
-
-        const res = await fetch(`${API_URL}${route}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(bodyData)
-        });
-
-        const data = await res.json();
-        if (res.ok) {
-            if(isLogin) {
-                localStorage.setItem('pomoToken', data.token);
-                navigateTo('mainApp');
-                loadHistory();
-            } else {
-                alert("Account created! Now login.");
-                toggleAuthMode();
-            }
-        } else { alert(data.error); }
-    }
-
-    // --- PROFILE & HISTORY ---
-    async function showProfile() {
-        const token = localStorage.getItem('pomoToken');
-        if (!token) return logout();
-
-        try {
-            const res = await fetch(`${API_URL}/me`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+        // --- VIEW NAVIGATION ---
+        function navigateTo(pageId) {
+            const pages = ['authContainer', 'mainApp', 'profilePage'];
+            pages.forEach(id => {
+                const el = document.getElementById(id);
+                if (id === pageId) {
+                    el.style.display = (id === 'profilePage' || id === 'mainApp') ? 'block' : 'flex';
+                } else {
+                    el.style.display = 'none';
+                }
             });
-            const userData = await res.json();
-
-            document.getElementById('profUser').innerText = userData.username;
-            document.getElementById('profEmail').innerText = userData.email || "N/A";
-            document.getElementById('profPhone').innerText = userData.phone || "N/A";
-            document.getElementById('profDOB').innerText = userData.dob ? new Date(userData.dob).toLocaleDateString() : "N/A";
-
-            navigateTo('profilePage');
-            loadHistory();
-        } catch (err) {
-            console.error("Profile load failed", err);
         }
-    }
-    function showApp() {
-    document.getElementById('authContainer').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    loadHistory(); // <--- IF THIS CRASHES, THE LINE ABOVE MIGHT FAIL
-}
 
-    function showTimer() { navigateTo('mainApp'); }
+        function toggleAuthMode() {
+            isLogin = !isLogin;
+            const extra = document.getElementById('extraFields');
+            const forgotLink = document.getElementById('forgotPassLink');
 
-    async function loadHistory() {
-    const token = localStorage.getItem('pomoToken');
-    if (!token) return;
+            extra.style.display = isLogin ? 'none' : 'block';
+            forgotLink.style.display = isLogin ? 'block' : 'none';
 
-    try {
-        const res = await fetch(`${API_URL}/my-tasks`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        // If the server error is here, this stops the "lag"
-        if (!res.ok) throw new Error("History fetch failed");
+            document.getElementById('authTitle').innerText = isLogin ? "Focus Time" : "Join Us";
+            document.getElementById('authBtn').innerText = isLogin ? "Log In" : "Sign Up";
+            document.getElementById('switchText').innerText = isLogin ? "New here?" : "Already have an account?";
+            document.getElementById('toggleLink').innerText = isLogin ? "Create Account" : "Login instead";
+        }
 
-        const data = await res.json();
-        const list = document.getElementById('profileHistoryList');
-        if (!list) return; {
-            list.innerHTML = data.map(t => `
+        // --- AUTHENTICATION ---
+        async function handleAuth() {
+            const user = document.getElementById('userInput').value;
+            const pass = document.getElementById('passInput').value;
+            const route = isLogin ? "/login" : "/register";
+
+            // Collect extra fields if signing up
+            let bodyData = { username: user, password: pass };
+            if (!isLogin) {
+                bodyData.email = document.getElementById('emailInput').value;
+                bodyData.phone = document.getElementById('phoneInput').value;
+                bodyData.dob = document.getElementById('dobInput').value;
+            }
+
+            const res = await fetch(`${API_URL}${route}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bodyData)
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                if (isLogin) {
+                    localStorage.setItem('pomoToken', data.token);
+                    navigateTo('mainApp');
+                    loadHistory();
+                } else {
+                    alert("Account created! Now login.");
+                    toggleAuthMode();
+                }
+            } else { alert(data.error); }
+        }
+
+        // --- PROFILE & HISTORY ---
+        async function showProfile() {
+            const token = localStorage.getItem('pomoToken');
+            if (!token) return logout();
+
+            try {
+                const res = await fetch(`${API_URL}/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await res.json();
+
+                document.getElementById('profUser').innerText = userData.username;
+                document.getElementById('profEmail').innerText = userData.email || "N/A";
+                document.getElementById('profPhone').innerText = userData.phone || "N/A";
+                document.getElementById('profDOB').innerText = userData.dob ? new Date(userData.dob).toLocaleDateString() : "N/A";
+
+                navigateTo('profilePage');
+                loadHistory();
+            } catch (err) {
+                console.error("Profile load failed", err);
+            }
+        }
+        function showApp() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            loadHistory(); // <--- IF THIS CRASHES, THE LINE ABOVE MIGHT FAIL
+        }
+
+        function showTimer() { navigateTo('mainApp'); }
+
+        async function loadHistory() {
+            const token = localStorage.getItem('pomoToken');
+            if (!token) return;
+
+            try {
+                const res = await fetch(`${API_URL}/my-tasks`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                // If the server error is here, this stops the "lag"
+                if (!res.ok) throw new Error("History fetch failed");
+
+                const data = await res.json();
+                const list = document.getElementById('profileHistoryList');
+                if (!list) return; {
+                    list.innerHTML = data.map(t => `
                 <div class="history-item">
                     <span>${t.task_name}</span>
                     <span>${new Date(t.created_at).toLocaleDateString()}</span>
                 </div>
-            `).join('');}
-    } catch (err) {
-        console.error("History Error:", err);
-    }
-}
-
-    // --- TIMER LOGIC ---
-    function startTimer() {
-        if (timerId) return;
-        document.getElementById('startBtn').innerText = "Focusing...";
-        timerId = setInterval(() => {
-            timeLeft--;
-            updateDisplay();
-            if (timeLeft <= 0) {
-                clearInterval(timerId);
-                timerId = null;
-                saveSession();
-                document.getElementById('celebrationModal').style.display = 'flex';
-                window.onbeforeunload = function() {
-                    return "Your focus session is active! Are you sure you want to leave?";
-                };
+            `).join('');
+                }
+            } catch (err) {
+                console.error("History Error:", err);
             }
-        }, 1000);
-    }
-
-    let currentAnswer;
-
-function requestExit() {
-    // Generate a simple math challenge: e.g., 12 + 5
-    const num1 = Math.floor(Math.random() * 10) + 1;
-    const num2 = Math.floor(Math.random() * 10) + 1;
-    currentAnswer = num1 + num2;
-    
-    document.getElementById('mathQuestion').innerText = `${num1} + ${num2} = ?`;
-    document.getElementById('exitModal').style.display = 'block';
-}
-
-function closeExitModal() {
-    document.getElementById('exitModal').style.display = 'none';
-}
-
-async function confirmExit() {
-    const userAnswer = parseInt(document.getElementById('exitVerificationInput').value);
-    
-    if (userAnswer === currentAnswer) {
-        stopTimerLogic(); // The function that actually kills the clock
-        closeExitModal();
-        
-        // Notify Backend that the session was cancelled
-        await fetch(`${API_URL}/api/timer-event`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'cancelled', username: currentUser })
-        });
-    } else {
-        alert("Wrong answer! Stay focused!");
-    }
-}
-
-function stopTimerLogic() {
-    clearInterval(timerInterval); // Stop the counting
-    window.onbeforeunload = null; // Remove browser lock
-    document.getElementById('stopBtn').style.display = 'none';
-    document.getElementById('startBtn').style.display = 'inline-block';
-}
-
-    function resetTimer() {
-        clearInterval(timerId);
-        timerId = null;
-        timeLeft = 25 * 60; 
-        updateDisplay();
-        document.getElementById('startBtn').innerText = "Start Focus";
-    }
-
-    function updateDisplay() {
-        const mins = Math.floor(timeLeft / 60);
-        const secs = timeLeft % 60;
-        document.getElementById('timerDisplay').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    }
-
-    async function saveSession() {
-        const task = document.getElementById('taskInput').value || "Deep Work";
-        const token = localStorage.getItem('pomoToken');
-        await fetch(`${API_URL}/start-task`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ taskName: task })
-        });
-        loadHistory();
-    }
-
-    function closeModal() {
-        document.getElementById('celebrationModal').style.display = 'none';
-        resetTimer();
-    }
-
-    function logout() {
-        localStorage.removeItem('pomoToken');
-        location.reload();
-    }
-    
-    // This MUST be inside your <script> tags
-async function handleForgotPassword() {
-    const username = document.getElementById('userInput').value;
-
-    if (!username) {
-        alert("Please enter your username in the login box first!");
-        return;
-    }
-
-    try {
-        // This talks to the Node.js server you just set up
-        const response = await fetch(`${API_URL}/api/forgot-password`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username })
-        });
-
-        const data = await response.json();
-        alert(data.message);
-        
-    } catch (error) {
-        console.error("Connection Error:", error);
-        alert("Could not connect to the server. Is your backend running?");
-    }
-}
-
-    window.onload = () => {
-        if (localStorage.getItem('pomoToken')) {
-            navigateTo('mainApp');
-            loadHistory();
-        } else {
-            navigateTo('authContainer');
         }
-    };
+
+        // --- TIMER LOGIC ---
+        function startTimer() {
+            if (timerId) return;
+            document.getElementById('startBtn').innerText = "Focusing...";
+            timerId = setInterval(() => {
+                timeLeft--;
+                updateDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    timerId = null;
+                    saveSession();
+                    document.getElementById('celebrationModal').style.display = 'flex';
+                    window.onbeforeunload = function () {
+                        return "Your focus session is active! Are you sure you want to leave?";
+                    };
+                }
+            }, 1000);
+        }
+
+        let currentAnswer;
+
+        function requestExit() {
+            // Generate a simple math challenge: e.g., 12 + 5
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            currentAnswer = num1 + num2;
+
+            document.getElementById('mathQuestion').innerText = `${num1} + ${num2} = ?`;
+            document.getElementById('exitModal').style.display = 'block';
+        }
+
+        function closeExitModal() {
+            document.getElementById('exitModal').style.display = 'none';
+        }
+
+        async function confirmExit() {
+            const userAnswer = parseInt(document.getElementById('exitVerificationInput').value);
+
+            if (userAnswer === currentAnswer) {
+                stopTimerLogic(); // The function that actually kills the clock
+                closeExitModal();
+
+                // Notify Backend that the session was cancelled
+                await fetch(`${API_URL}/api/timer-event`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'cancelled', username: currentUser })
+                });
+            } else {
+                alert("Wrong answer! Stay focused!");
+            }
+        }
+
+        function stopTimerLogic() {
+            clearInterval(timerInterval); // Stop the counting
+            window.onbeforeunload = null; // Remove browser lock
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'inline-block';
+        }
+
+        function resetTimer() {
+            clearInterval(timerId);
+            timerId = null;
+            timeLeft = 25 * 60;
+            updateDisplay();
+            document.getElementById('startBtn').innerText = "Start Focus";
+        }
+
+        function updateDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('timerDisplay').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        async function saveSession() {
+            const task = document.getElementById('taskInput').value || "Deep Work";
+            const token = localStorage.getItem('pomoToken');
+            await fetch(`${API_URL}/start-task`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ taskName: task })
+            });
+            loadHistory();
+        }
+
+        function closeModal() {
+            document.getElementById('celebrationModal').style.display = 'none';
+            resetTimer();
+        }
+
+        function logout() {
+            localStorage.removeItem('pomoToken');
+            location.reload();
+        }
+
+        // This MUST be inside your <script> tags
+        async function handleForgotPassword() {
+            const username = document.getElementById('userInput').value;
+
+            if (!username) {
+                alert("Please enter your username in the login box first!");
+                return;
+            }
+
+            try {
+                // This talks to the Node.js server you just set up
+                const response = await fetch(`${API_URL}/api/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+
+                const data = await response.json();
+                alert(data.message);
+
+            } catch (error) {
+                console.error("Connection Error:", error);
+                alert("Could not connect to the server. Is your backend running?");
+            }
+        }
+
+        window.onload = () => {
+            if (localStorage.getItem('pomoToken')) {
+                navigateTo('mainApp');
+                loadHistory();
+            } else {
+                navigateTo('authContainer');
+            }
+        };
     </script>
 </body>
+
 </html>
