@@ -102,6 +102,38 @@ app.put('/update-password', async (req, res) => {
     await pool.query('UPDATE users SET password = $1 WHERE username = $2', [newPassword, username]);
     res.json({ message: "Password updated!" });
 });
+
+app.post('/api/forgot-password', async (req, res) => {
+    const { username } = req.body;
+
+    try {
+        // 1. Check if user exists
+        const userCheck = await pool.query('SELECT email FROM users WHERE username = $1', [username]);
+
+        if (userCheck.rows.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const userEmail = userCheck.rows[0].email;
+
+        // 2. Define the email content
+        const mailOptions = {
+            from: 'pomofocusweb@gmail.com',
+            to: userEmail,
+            subject: 'Pomo Focus - Password Reset Request',
+            text: `Hi ${username}, you requested a password reset. For your project demo, your password remains unchanged, but this email confirms the system works!`
+        };
+
+        // 3. Send the email
+        await transporter.sendMail(mailOptions);
+        
+        res.json({ message: "A reset email has been sent to your registered address!" });
+
+    } catch (err) {
+        console.error("Nodemailer Error:", err);
+        res.status(500).json({ message: "Failed to send email. Check server logs." });
+    }
+});
 // 6. FETCH TASKS (Protected)
 app.get('/my-tasks', async (req, res) => {
     const token = req.headers['authorization'];
@@ -303,6 +335,16 @@ app.get('/me', authenticateToken, async (req, res) => {
     res.json(result.rows[0]);
 });
 
+const nodemailer = require('nodemailer');
+
+// Create the email transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'pomofocusweb@gmail.com',
+        pass: 'ksld bkxw pstb lewe' // 16-character code from Google
+    }
+});
 // Export for Vercel
 module.exports = app;
 
