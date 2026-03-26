@@ -343,8 +343,8 @@ const transporter = nodemailer.createTransport({
     port: 465, // Use 465 for Secure connection
     secure: true, // true for 465, false for other ports
     auth: {
-        user: 'your-email@gmail.com',
-        pass: 'your-16-digit-app-password' // No spaces
+        user: 'pomofocusweb@gmail.com',
+        pass: 'ksldbkxwpstblewe' // No spaces
     },
     tls: {
         // This helps if Render is having trouble verifying the SSL certificate
