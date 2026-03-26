@@ -353,7 +353,7 @@ async function handleForgotPassword() {
     }
 
     try {
-        // This talks to your Node.js server you just set up
+        // This talks to the Node.js server you just set up
         const response = await fetch(`${API_URL}/api/forgot-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
