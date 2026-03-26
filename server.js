@@ -170,6 +170,37 @@ app.post('/start-task', async (req, res) => {
     }
 });
 
+// Add this route to your server.js
+app.post('/api/timer-history', async (req, res) => {
+    const { username, status, duration } = req.body;
+
+    try {
+        const result = await pool.query(
+            'INSERT INTO timer_history (username, status, duration_minutes) VALUES ($1, $2, $3) RETURNING *',
+            [username, status, duration]
+        );
+        res.status(201).json({ message: "Session recorded!", entry: result.rows[0] });
+    } catch (err) {
+        console.error("Database Error:", err);
+        res.status(500).json({ message: "Failed to save history." });
+    }
+});
+
+app.post('/api/timer-event', async (req, res) => {
+    const { status, username } = req.body;
+    try {
+        // Log into your PostgreSQL table that the user quit early
+        await pool.query(
+            'INSERT INTO timer_history (username, status, timestamp) VALUES ($1, $2, NOW())',
+            [username, status]
+        );
+        res.json({ message: "Event logged" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+});
+
 // 8. DELETE TASK
 app.delete('/delete-task/:id', async (req, res) => {
     const token = req.headers['authorization'];

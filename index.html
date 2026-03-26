@@ -131,6 +131,7 @@
     <div id="timerDisplay">01:00</div>
     <button class="btn btn-primary" onclick="startTimer()" id="startBtn">Start Focus</button>
     <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
+    <button id="stopBtn" onclick="requestExit()" style="display:none;">Break Focus</button>
     <button class="btn-outline" onclick="showProfile()" style="margin-top: 20px;">View Profile & History</button>
     <button class="btn btn-outline" onclick="logout()" style="margin-top: 10px; color: #8b5e3c; border-color: #8b5e3c;">Logout</button>
 </div>
@@ -155,6 +156,18 @@
     <div style="margin-top: 40px; border-top: 1px solid rgba(74, 63, 53, 0.1); padding-top: 20px;">
         <p class="subtitle" style="color: #a33;">Danger Zone</p>
         <button class="btn-danger" onclick="deleteAccount()">Delete Account Permanently</button>
+    </div>
+</div>
+
+<div id="exitModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>STOP TIMER?</h3>
+        <p>To break your focus, solve this: <br> <span id="mathQuestion"></span></p>
+        <input type="number" id="exitVerificationInput" placeholder="Answer...">
+        <div class="modal-buttons">
+            <button class="confirm-btn" onclick="confirmExit()">Confirm Break</button>
+            <button class="cancel-btn" onclick="closeExitModal()">Back to Work</button>
+        </div>
     </div>
 </div>
 
@@ -304,6 +317,9 @@
                 timerId = null;
                 saveSession();
                 document.getElementById('celebrationModal').style.display = 'flex';
+                window.onbeforeunload = function() {
+                    return "Your focus session is active! Are you sure you want to leave?";
+                };
             }
         }, 1000);
     }
